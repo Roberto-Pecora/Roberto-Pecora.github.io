@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roberto Pecora</title>
+<meta name="description" content="Senior data scientist working on LLM post-training, RLHF, and production ML systems.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css?v=1787861827">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Portfolio: LLM Post-Training &amp; Applied Data Science</p>
+    <h1 class="name">Roberto Pecora</h1>
+    <p class="thesis">
+      Senior data scientist with a keen interest in LLM post-training, agentic AI, and cutting-edge research.
+    </p>
+    <nav class="links">
+      <a href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </nav>
+  </header>
+
+  <!-- ================= RLHF / POST-TRAINING ================= -->
+  <section>
+    <div class="section-head">
+      <h2>LLM Post-Training &amp; RLHF Research</h2>
+      <span class="tag">5 studies</span>
+    </div>
+    <p class="section-note">
+      Controlled experimental studies of post-training methods for modern instruction-tuned language models, including supervised fine-tuning, preference optimisation, and reinforcement learning from verifiable and human-derived rewards. Each study isolates a single variable and reports uncertainty using bootstrap confidence intervals or paired statistical tests instead of single-run point estimates.
+    </p>
+
+    <div class="card-grid">
+      <a class="card" href="rlhf.html#grpo-math-reasoning">
+        <div class="card-top">
+          <span class="card-title">GRPO vs. SFT on verifiable math reward</span>
+          <span class="card-stat">+9.9 pts, p&lt;4e-4</span>
+        </div>
+        <p class="card-hook">GRPO beats SFT on math problems with a checkable reward, but regresses 43 problems SFT had already solved.</p>
+        <div class="card-pills">
+          <span class="pill">GRPO</span>
+          <span class="pill">Qwen2.5-1.5B</span>
+          <span class="pill">McNemar test</span>
+        </div>
+      </a>
+
+      <a class="card" href="rlhf.html#rloo-vs-ppo-rlhf">
+        <div class="card-top">
+          <span class="card-title">Reproducing RLOO vs. PPO with Claude as judge</span>
+          <span class="card-stat">PPO 3× SFT win rate</span>
+        </div>
+        <p class="card-hook">Reruns a published RLHF comparison on the original checkpoints, swapping the GPT-4 judge for Claude, and surfaces a stylistic confound the win-rate gap would otherwise hide.</p>
+        <div class="card-pills">
+          <span class="pill">RLOO</span>
+          <span class="pill">PPO</span>
+          <span class="pill">Claude-as-judge</span>
+        </div>
+      </a>
+
+      <a class="card" href="rlhf.html#qwen3-financial-sft-unsloth-dpo">
+        <div class="card-top">
+          <span class="card-title">Financial LLM post-training: SFT → DPO on Qwen3-4B</span>
+          <span class="card-stat">27× arithmetic gain</span>
+        </div>
+        <p class="card-hook">Trains a small open model to answer numeric questions grounded in real filings; the aggregate score hides a real tradeoff between arithmetic and extraction accuracy.</p>
+        <div class="card-pills">
+          <span class="pill">Qwen3-4B</span>
+          <span class="pill">QLoRA</span>
+          <span class="pill">DPO</span>
+        </div>
+      </a>
+    </div>
+
+    <a class="explore-link" href="rlhf.html">
+      Explore all RLHF &amp; post-training studies
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </section>
+
+  <!-- ================= APPLIED DS/ML ================= -->
+  <section>
+    <div class="section-head">
+      <h2>Applied Data Science &amp; ML</h2>
+      <span class="tag">4 projects</span>
+    </div>
+    <p class="section-note">
+      Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be, on time rather than on shuffled folds.
+    </p>
+
+    <div class="card-grid">
+      <a class="card" href="applied-ml.html#kafka-grid-intelligence">
+        <div class="card-top">
+          <span class="card-title">Real-time grid-stress prediction over Kafka</span>
+          <span class="card-stat">84% precision</span>
+        </div>
+        <p class="card-hook">Streams GB grid demand and generation-mix data through Kafka, scores it live with an XGBoost classifier, and writes predictions to Postgres for a live dashboard.</p>
+        <div class="card-pills">
+          <span class="pill">Kafka</span>
+          <span class="pill">XGBoost</span>
+          <span class="pill">PR-AUC</span>
+        </div>
+      </a>
+
+      <a class="card" href="applied-ml.html#nhs-intelligence-mcp">
+        <div class="card-top">
+          <span class="card-title">MCP server for NHS waiting times &amp; trust quality</span>
+          <span class="card-stat">130 trusts, 74 specialties</span>
+        </div>
+        <p class="card-hook">Exposes deterministic data tools to Claude and any MCP client; no LLM inside the server, no network calls at query time, refreshed weekly via CI.</p>
+        <div class="card-pills">
+          <span class="pill">MCP</span>
+          <span class="pill">SQLite</span>
+          <span class="pill">GitHub Actions</span>
+        </div>
+      </a>
+
+      <a class="card" href="applied-ml.html#actor_critic_financial_rag_repo">
+        <div class="card-top">
+          <span class="card-title">Actor–critic RAG over SEC filings</span>
+          <span class="card-stat">Abstains below 0.8</span>
+        </div>
+        <p class="card-hook">A critic model vetoes low-confidence answers into explicit abstention, on the premise that a wrong answer costs more than no answer.</p>
+        <div class="card-pills">
+          <span class="pill">RAG</span>
+          <span class="pill">SEC EDGAR</span>
+          <span class="pill">Actor-critic</span>
+        </div>
+      </a>
+    </div>
+
+    <a class="explore-link" href="applied-ml.html">
+      Explore all Applied Data Science &amp; ML projects
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </section>
+
+  <footer>
+    <h2>Get in touch</h2>
+    <p>If you want to talk about challenging AI/ML projects, opportunities, or collaborations.</p>
+    <div class="contact-row">
+      <a class="btn primary" href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">Message on LinkedIn</a>
+      <a class="btn" href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">Browse the code</a>
+    </div>
+    <p class="foot-note">Every project above is real, inspectable code: open a repository to see how a specific result was produced.</p>
+  </footer>
+
+</div>
+</body>
+</html>

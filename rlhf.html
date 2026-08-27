@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LLM Post-Training &amp; RLHF Research — Roberto Pecora</title>
+<meta name="description" content="Five controlled studies comparing SFT, DPO, GRPO, PPO, and RLOO on verifiable and preference-based rewards.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css?v=1787861827">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <a class="back-link" href="index.html">← Roberto Pecora</a>
+    <p class="eyebrow">5 studies</p>
+    <h1 class="page-title">LLM Post-Training &amp; RLHF Research</h1>
+    <p class="thesis">
+      Controlled experimental studies of post-training methods for modern instruction-tuned language models, including supervised fine-tuning, preference optimisation, and reinforcement learning from verifiable and human-derived rewards. Each study isolates a single variable and reports uncertainty using bootstrap confidence intervals or paired statistical tests instead of single-run point estimates.
+    </p>
+  </header>
+
+  <section>
+    <article class="entry" id="qwen3-financial-sft-unsloth-dpo">
+      <div class="entry-head">
+        <h3 class="entry-title">Financial LLM post-training: SFT → DPO on Qwen3-4B</h3>
+        <span class="repo-name">qwen3-financial-sft-unsloth-dpo</span>
+      </div>
+      <div class="entry-body">
+        <p>Base instruct models handle numeric financial questions poorly when the answer has to be grounded in a real filing rather than recalled. This project trains a small open model on that skill directly, then measures whether preference optimisation on top of it helps or quietly trades one capability for another.</p>
+        <p class="subhead">Technique &amp; Impact</p>
+        <p>Rank-16 QLoRA adapters on 4-bit Qwen3-4B: one epoch of supervised fine-tuning on TAT-QA, followed by DPO (β=0.1) on preference pairs. Each rejected answer is a shape-matched gold answer pulled from a <em>different</em> question, rather than a single constant rejection, forcing the model to distinguish correctness from surface plausibility.</p>
+        <p class="subhead">Performance Highlights</p>
+        <p>Aggregate accuracy fell from 19.5% (base) to 14.1% (DPO) across 662 evaluation examples — but the per-answer-type breakdown shows this is a real tradeoff, not noise. Arithmetic accuracy rose <code>27×</code> (0.36% → 9.96%) and multi-span accuracy also improved (23.5% → 27.9%), while count questions regressed sharply (35.0% → 10.0%) and extractive span only partly recovered from the SFT dip (10.9% → 15.0%, still below base's 35.2%).</p>
+        <div class="chart-group" role="img" aria-label="Small-multiples bar chart: accuracy by answer type and checkpoint. Arithmetic: base 0.4%, SFT 9.6%, DPO 10.0%. Span: base 35.2%, SFT 10.9%, DPO 15.0%. Multi-span: base 36.8%, SFT 23.5%, DPO 27.9%. Count: base 0.0%, SFT 35.0%, DPO 10.0%.">
+          <div class="chart-group-item">
+            <h4>Arithmetic (n=281)</h4>
+            <div class="chart-rows">
+              <div class="chart-row"><span class="row-label">Base</span><span class="row-track"><span class="row-bar base" style="width: 3.6%"></span></span><span class="row-value">0.4%</span></div>
+              <div class="chart-row"><span class="row-label">SFT</span><span class="row-track"><span class="row-bar sft" style="width: 96.5%"></span></span><span class="row-value">9.6%</span></div>
+              <div class="chart-row"><span class="row-label">DPO</span><span class="row-track"><span class="row-bar dpo" style="width: 100%"></span></span><span class="row-value">10.0%</span></div>
+            </div>
+          </div>
+          <div class="chart-group-item">
+            <h4>Span (n=293)</h4>
+            <div class="chart-rows">
+              <div class="chart-row"><span class="row-label">Base</span><span class="row-track"><span class="row-bar base" style="width: 100%"></span></span><span class="row-value">35.2%</span></div>
+              <div class="chart-row"><span class="row-label">SFT</span><span class="row-track"><span class="row-bar sft" style="width: 31.0%"></span></span><span class="row-value">10.9%</span></div>
+              <div class="chart-row"><span class="row-label">DPO</span><span class="row-track"><span class="row-bar dpo" style="width: 42.6%"></span></span><span class="row-value">15.0%</span></div>
+            </div>
+          </div>
+          <div class="chart-group-item">
+            <h4>Multi-span (n=68)</h4>
+            <div class="chart-rows">
+              <div class="chart-row"><span class="row-label">Base</span><span class="row-track"><span class="row-bar base" style="width: 100%"></span></span><span class="row-value">36.8%</span></div>
+              <div class="chart-row"><span class="row-label">SFT</span><span class="row-track"><span class="row-bar sft" style="width: 64.0%"></span></span><span class="row-value">23.5%</span></div>
+              <div class="chart-row"><span class="row-label">DPO</span><span class="row-track"><span class="row-bar dpo" style="width: 76.0%"></span></span><span class="row-value">27.9%</span></div>
+            </div>
+          </div>
+          <div class="chart-group-item">
+            <h4>Count (n=20)</h4>
+            <div class="chart-rows">
+              <div class="chart-row"><span class="row-label">Base</span><span class="row-track"><span class="row-bar base" style="width: 0.1%"></span></span><span class="row-value">0.0%</span></div>
+              <div class="chart-row"><span class="row-label">SFT</span><span class="row-track"><span class="row-bar sft" style="width: 100%"></span></span><span class="row-value">35.0%</span></div>
+              <div class="chart-row"><span class="row-label">DPO</span><span class="row-track"><span class="row-bar dpo" style="width: 28.6%"></span></span><span class="row-value">10.0%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <span class="key"><span class="swatch base"></span>Base</span>
+          <span class="key"><span class="swatch sft"></span>SFT</span>
+          <span class="key"><span class="swatch dpo"></span>DPO</span>
+        </div>
+        <p class="chart-note">Each panel scaled to its own max; bars are not comparable in height across panels, only within one.</p>
+      </div>
+      <div class="tag-row">
+        <span class="pill">Qwen3-4B</span>
+        <span class="pill">QLoRA</span>
+        <span class="pill">Unsloth</span>
+        <span class="pill">DPO</span>
+        <span class="pill">MLflow</span>
+      </div>
+      <a class="repo-link" href="https://github.com/Roberto-Pecora/qwen3-financial-sft-unsloth-dpo" target="_blank" rel="noopener">View repository ↗</a>
+    </article>
+
+    <article class="entry" id="grpo-math-reasoning">
+      <div class="entry-head">
+        <h3 class="entry-title">GRPO vs. SFT on verifiable math reward</h3>
+        <span class="repo-name">grpo-math-reasoning</span>
+      </div>
+      <div class="entry-body">
+        <p>On math problems where correctness is mechanically decidable, this study tests whether learning from a checkable reward beats imitating labelled examples. Both methods are trained on a single base model, rather than compared across published numbers from different setups.</p>
+        <p class="subhead">Technique &amp; Impact</p>
+        <p>Rank-32 QLoRA on Qwen2.5-1.5B, trained with GRPO against a stacked reward (format + correctness) rather than correctness alone. A 1.5B model rarely gets the exact answer right early in training, so a correctness-only reward gives no learning signal until it does.</p>
+        <p class="subhead">Performance Highlights</p>
+        <p>GRPO reached 70.8% vs. SFT's 60.9%, a 9.9-point gain significant at <code>p&lt;4e-4</code>. It also regressed 43 problems SFT had already solved even while fixing 80 others, a real cost the headline number obscures.</p>
+        <div class="chart" role="img" aria-label="Diverging bar chart: relative to SFT, GRPO fixed 80 problems and regressed 43 problems that SFT had solved.">
+          <p class="chart-title">Per-problem shift, GRPO relative to SFT</p>
+          <div class="chart-rows">
+            <div class="chart-row">
+              <span class="row-label">Fixed</span>
+              <span class="row-track"><span class="row-bar" style="width: 100%"></span></span>
+              <span class="row-value">+80</span>
+            </div>
+            <div class="chart-row">
+              <span class="row-label">Regressed</span>
+              <span class="row-track"><span class="row-bar loss" style="width: 53.75%"></span></span>
+              <span class="row-value">−43</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span class="key"><span class="swatch gain"></span>Problems GRPO fixed</span>
+            <span class="key"><span class="swatch loss"></span>Problems GRPO broke</span>
+          </div>
+          <p class="chart-note">Net +37 problems; the 9.9-point aggregate gain hides both directions of change.</p>
+        </div>
+      </div>
+      <div class="tag-row">
+        <span class="pill">GRPO</span>
+        <span class="pill">Qwen2.5-1.5B</span>
+        <span class="pill">QLoRA</span>
+        <span class="pill">Bootstrap CI</span>
+        <span class="pill">McNemar test</span>
+      </div>
+      <a class="repo-link" href="https://github.com/Roberto-Pecora/grpo-math-reasoning" target="_blank" rel="noopener">View repository ↗</a>
+    </article>
+
+    <article class="entry" id="policy-gradient-from-scratch">
+      <div class="entry-head">
+        <h3 class="entry-title">Policy gradients from scratch: REINFORCE → GRPO</h3>
+        <span class="repo-name">policy-gradient-from-scratch</span>
+      </div>
+      <div class="entry-body">
+        <p>Every RLHF-family algorithm shares one core idea, obscured by the different names and frameworks each is usually taught through. This project makes that idea visible by implementing five of them from scratch, with no RL library standing between the equations and the code.</p>
+        <p class="subhead">Technique &amp; Impact</p>
+        <p>A digit-sum toy task mirrors a GSM8K-style verifier: reward is 1.0 only if the generated digits sum to a target, with several correct sequences per target so the policy has genuine exploration to do. All five algorithms differ only in how the advantage term is computed, making each one's marginal contribution directly measurable against the others.</p>
+        <p class="subhead">Performance Highlights</p>
+        <p>Accuracy rose monotonically with the sophistication of the advantage estimator: REINFORCE reached 49.9%, PPO 81.0%, and RLOO 98.2% on the same task and base model.</p>
+        <div class="chart" role="img" aria-label="Bar chart: accuracy by advantage estimator. REINFORCE 49.9%, PPO 81.0%, RLOO 98.2%.">
+          <p class="chart-title">Accuracy by advantage estimator</p>
+          <div class="chart-rows">
+            <div class="chart-row">
+              <span class="row-label">REINFORCE</span>
+              <span class="row-track"><span class="row-bar" style="width: 49.9%"></span></span>
+              <span class="row-value">49.9%</span>
+            </div>
+            <div class="chart-row">
+              <span class="row-label">PPO</span>
+              <span class="row-track"><span class="row-bar" style="width: 81.0%"></span></span>
+              <span class="row-value">81.0%</span>
+            </div>
+            <div class="chart-row">
+              <span class="row-label">RLOO</span>
+              <span class="row-track"><span class="row-bar" style="width: 98.2%"></span></span>
+              <span class="row-value">98.2%</span>
+            </div>
+          </div>
+          <p class="chart-note">Same digit-sum task and base model throughout; algorithms differ only in the advantage term.</p>
+        </div>
+      </div>
+      <div class="tag-row">
+        <span class="pill">PyTorch</span>
+        <span class="pill">REINFORCE</span>
+        <span class="pill">PPO</span>
+        <span class="pill">RLOO</span>
+        <span class="pill">GRPO</span>
+      </div>
+      <a class="repo-link" href="https://github.com/Roberto-Pecora/policy-gradient-from-scratch" target="_blank" rel="noopener">View repository ↗</a>
+    </article>
+
+    <article class="entry" id="rloo-vs-ppo-rlhf">
+      <div class="entry-head">
+        <h3 class="entry-title">Reproducing RLOO vs. PPO with Claude as judge</h3>
+        <span class="repo-name">rloo-vs-ppo-rlhf</span>
+      </div>
+      <div class="entry-body">
+        <p>Published RLHF comparisons are usually judged by a single model, which raises the question of how much of the result is the training method versus the judge's particular preferences. This study reruns a published comparison on the original checkpoints, swapping the original GPT-4 judge for Claude.</p>
+        <p class="subhead">Technique &amp; Impact</p>
+        <p>Slot assignment, which summary the judge sees as A vs. B, is keyed deterministically by seed and example ID, controlling for position bias without needing to persist any extra state across runs.</p>
+        <p class="subhead">Performance Highlights</p>
+        <p>The method ranking held under the new judge: PPO led at a 47.0% win rate, RLOO at 39.7%, both well above the SFT baseline's 15.3%. However, 93.3% of RLOO completions ended in <code>!</code> or <code>?</code>, a stylistic confound the win-rate gap alone would have completely hidden.</p>
+        <div class="chart" role="img" aria-label="Bar chart: win rate against SFT baseline under Claude-as-judge. SFT 15.3%, RLOO 39.7%, PPO 47.0%.">
+          <p class="chart-title">Win rate vs. SFT baseline, judged by Claude</p>
+          <div class="chart-rows">
+            <div class="chart-row">
+              <span class="row-label">SFT</span>
+              <span class="row-track"><span class="row-bar" style="width: 15.3%"></span></span>
+              <span class="row-value">15.3%</span>
+            </div>
+            <div class="chart-row">
+              <span class="row-label">RLOO</span>
+              <span class="row-track"><span class="row-bar" style="width: 39.7%"></span></span>
+              <span class="row-value">39.7%</span>
+            </div>
+            <div class="chart-row">
+              <span class="row-label">PPO</span>
+              <span class="row-track"><span class="row-bar" style="width: 47.0%"></span></span>
+              <span class="row-value">47.0%</span>
+            </div>
+          </div>
+          <p class="chart-note">93.3% of RLOO completions end in ! or ?, a stylistic tell the win-rate gap alone doesn't surface.</p>
+        </div>
+      </div>
+      <div class="tag-row">
+        <span class="pill">Pythia-1B</span>
+        <span class="pill">RLOO</span>
+        <span class="pill">PPO</span>
+        <span class="pill">Claude-as-judge</span>
+        <span class="pill">TL;DR dataset</span>
+      </div>
+      <a class="repo-link" href="https://github.com/Roberto-Pecora/rloo-vs-ppo-rlhf" target="_blank" rel="noopener">View repository ↗</a>
+    </article>
+
+    <article class="entry" id="sft-vs-dpo-grid-walk">
+      <div class="entry-head">
+        <h3 class="entry-title">SFT vs. DPO on a minimal grid-walk grammar</h3>
+        <span class="repo-name">sft-vs-dpo-grid-walk</span>
+      </div>
+      <div class="entry-body">
+        <p>Imitating a distribution (SFT) and optimising an objective (DPO) are easy to conflate in practice. This teaching example separates the two on a grid-walk small enough to reason about by hand, rebuilding an existing but broken demonstration into something reliable.</p>
+        <p class="subhead">Technique &amp; Impact</p>
+        <p>A no-immediate-reversal move grammar generates walks independently of grid geometry. Every generator takes an explicit seeded RNG rather than relying on global state, closing a reproducibility gap in the original implementation.</p>
+        <p class="subhead">Performance Highlights</p>
+        <p>DPO raises the target-zone score from 0.1298 to 0.1627, a ~25% relative gain, at a small cost to rule adherence (1.0000 → 0.9982). Rebuilt with seeded splits, a full test suite, and CI in place of the original's single notebook, which had never run cleanly end to end.</p>
+        <figure class="entry-figure">
+          <img src="assets/grid-walk-animation.gif" alt="Animated comparison of base, SFT, and DPO policies walking the grid toward the target zone, with a live percent-in-zone readout for each." loading="lazy">
+          <figcaption>Base, SFT, and DPO walks toward the target zone (yellow), side by side.</figcaption>
+        </figure>
+      </div>
+      <div class="tag-row">
+        <span class="pill">SFT</span>
+        <span class="pill">DPO</span>
+        <span class="pill">PyTorch</span>
+        <span class="pill">pytest</span>
+        <span class="pill">CI</span>
+      </div>
+      <a class="repo-link" href="https://github.com/Roberto-Pecora/sft-vs-dpo-grid-walk" target="_blank" rel="noopener">View repository ↗</a>
+    </article>
+  </section>
+
+  <footer>
+    <h2>Get in touch</h2>
+    <p>If you want to talk about challenging AI/ML projects, opportunities, or collaborations.</p>
+    <div class="contact-row">
+      <a class="btn primary" href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">Message on LinkedIn</a>
+      <a class="btn" href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">Browse the code</a>
+    </div>
+    <p class="foot-note">Every project above is real, inspectable code: open a repository to see how a specific result was produced.</p>
+  </footer>
+
+</div>
+</body>
+</html>
