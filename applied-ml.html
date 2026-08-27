@@ -6,211 +6,459 @@
 <title>Applied Data Science &amp; ML — Roberto Pecora</title>
 <meta name="description" content="Production-shaped ML work: real-time grid-stress prediction, an NHS data MCP server and pipeline, and actor-critic RAG over SEC filings.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="styles.css?v=1787861827">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper: #EFEBE1;
+  --paper-shadow: #E4DFD1;
+  --ink: #1C1A15;
+  --ink-soft: #4A4638;
+  --rule: #C9C2AB;
+  --rule-heavy: #1C1A15;
+  --accent-ink: #6B2E2E;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', 'SF Mono', Menlo, monospace;
+}
+*{ box-sizing: border-box; }
+body{
+  margin:0;
+  background:var(--paper-shadow);
+  color:var(--ink);
+  font-family:var(--serif);
+  -webkit-font-smoothing:antialiased;
+}
+
+.page{
+  max-width:900px;
+  margin:48px auto;
+  background:var(--paper);
+  padding:72px 88px 88px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.14);
+}
+
+.running-head{
+  display:flex;
+  justify-content:space-between;
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  border-bottom:1px solid var(--rule-heavy);
+  padding-bottom:10px;
+  margin-bottom:56px;
+}
+.running-head a{ color:inherit; text-decoration:underline; text-decoration-color:var(--rule); text-underline-offset:2px; }
+.running-head a:hover{ color:var(--accent-ink); text-decoration-color:var(--accent-ink); }
+
+.masthead{ margin-bottom:64px; }
+.masthead .kicker{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 16px;
+}
+.masthead h1{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:2.6rem;
+  line-height:1.15;
+  letter-spacing:-0.01em;
+  margin:0 0 20px;
+  text-wrap:balance;
+}
+.masthead .abstract{
+  font-size:1.02rem;
+  line-height:1.65;
+  color:var(--ink-soft);
+  max-width:62ch;
+  border-left:2px solid var(--rule-heavy);
+  padding-left:20px;
+}
+
+.paper-section{ margin-bottom:64px; }
+.paper-section:last-of-type{ margin-bottom:0; }
+
+.section-num{
+  display:flex;
+  align-items:baseline;
+  gap:14px;
+  margin-bottom:6px;
+}
+.section-num .num{
+  font-family:var(--mono);
+  font-size:0.85rem;
+  color:var(--accent-ink);
+  font-weight:500;
+}
+.section-num h2{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:1.35rem;
+  margin:0;
+  letter-spacing:-0.005em;
+}
+.section-meta{
+  font-family:var(--mono);
+  font-size:10.5px;
+  color:var(--ink-soft);
+  margin:0 0 22px 34px;
+}
+
+.paper-body{ margin-left:34px; }
+.paper-body p{
+  font-size:1rem;
+  line-height:1.7;
+  margin:0 0 18px;
+  max-width:64ch;
+  text-align:justify;
+  hyphens:auto;
+}
+.paper-body p:first-of-type::first-letter{
+  font-size:2.6em;
+  font-weight:600;
+  float:left;
+  line-height:0.85;
+  padding-right:6px;
+  padding-top:4px;
+  color:var(--accent-ink);
+}
+.paper-body code{
+  font-family:var(--mono);
+  font-size:0.85em;
+  color:var(--accent-ink);
+}
+.paper-body em{ font-style:italic; }
+
+.fig{ margin:32px 0; max-width:64ch; }
+.fig .fig-label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 4px;
+}
+.fig .fig-caption{
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:0.9rem;
+  color:var(--ink-soft);
+  margin:10px 0 0;
+  line-height:1.55;
+}
+.fig img{
+  width:100%;
+  height:auto;
+  display:block;
+  filter: sepia(8%) contrast(0.97);
+  border:1px solid var(--rule);
+}
+
+.tbl-wrap{ margin:28px 0; max-width:64ch; }
+.tbl-label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 8px;
+}
+table.paper-table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:var(--serif);
+  font-size:0.92rem;
+}
+table.paper-table thead tr{ border-top:1.5px solid var(--rule-heavy); border-bottom:1px solid var(--rule-heavy); }
+table.paper-table th{
+  text-align:left;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  font-weight:500;
+  color:var(--ink-soft);
+  padding:7px 14px 7px 0;
+}
+table.paper-table td{
+  padding:7px 14px 7px 0;
+  font-variant-numeric:tabular-nums;
+  border-bottom:1px solid var(--rule);
+}
+table.paper-table tbody tr:last-child{ border-bottom:1.5px solid var(--rule-heavy); }
+table.paper-table tbody tr:last-child td{ border-bottom:none; }
+table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
+
+/* borderless stat group, rule-bracketed */
+.stat-group{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+  gap:20px;
+  margin:28px 0;
+  padding:18px 0;
+  border-top:1px solid var(--rule-heavy);
+  border-bottom:1px solid var(--rule-heavy);
+  max-width:64ch;
+}
+.stat-group-item .stat-label{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  margin:0 0 6px;
+}
+.stat-group-item .stat-value{
+  font-family:var(--mono);
+  font-size:1.15rem;
+  color:var(--accent-ink);
+  font-variant-numeric:tabular-nums;
+}
+.stat-note{
+  font-size:0.88rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  max-width:64ch;
+  margin:0 0 18px;
+  line-height:1.55;
+}
+
+/* supplementary material — fold-out disclosure */
+.supplement{ margin:28px 0; max-width:64ch; }
+.supplement summary{
+  cursor:pointer;
+  list-style:none;
+  padding:12px 16px;
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  background:var(--paper-shadow);
+  border:1px solid var(--rule-heavy);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  transition:background 0.15s ease;
+}
+.supplement summary:hover{ background:var(--rule); }
+.supplement summary::-webkit-details-marker{ display:none; }
+.supplement summary::after{
+  content:"show ▾";
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--ink-soft);
+  flex-shrink:0;
+}
+.supplement[open] summary::after{ content:"hide ▴"; }
+.supplement[open] summary{ border-bottom:none; background:var(--rule); }
+.supplement .supplement-body{ border:1px solid var(--rule-heavy); border-top:none; padding:24px 16px; }
+.supplement .supplement-body .tbl-wrap:first-child{ margin-top:0; }
+.supplement .supplement-body .tbl-wrap:last-child,
+.supplement .supplement-body .fig:last-child{ margin-bottom:0; }
+
+.apparatus{
+  margin:24px 0 0 34px;
+  padding-top:18px;
+  border-top:1px solid var(--rule);
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--ink-soft);
+}
+.apparatus .label{ text-transform:uppercase; letter-spacing:0.04em; color:var(--accent-ink); margin-right:10px; }
+
+.refs{
+  margin:14px 0 0 34px;
+  font-family:var(--mono);
+  font-size:11.5px;
+}
+.refs a{ color:var(--ink); text-decoration:underline; text-decoration-color:var(--rule); text-underline-offset:2px; }
+.refs a:hover{ color:var(--accent-ink); text-decoration-color:var(--accent-ink); }
+.refs .sep{ color:var(--rule); margin:0 10px; }
+
+.colophon{
+  margin-top:72px;
+  padding-top:32px;
+  border-top:3px double var(--rule-heavy);
+  text-align:center;
+}
+.colophon h2{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:1.3rem;
+  margin:0 0 12px;
+}
+.colophon p{
+  font-size:0.92rem;
+  color:var(--ink-soft);
+  max-width:48ch;
+  margin:0 auto 16px;
+  font-style:italic;
+}
+.colophon .contact{
+  font-family:var(--mono);
+  font-size:11.5px;
+  font-style:normal;
+}
+.colophon .contact a{ color:var(--ink); text-decoration:underline; text-decoration-color:var(--rule); text-underline-offset:2px; }
+.colophon .contact a:hover{ color:var(--accent-ink); text-decoration-color:var(--accent-ink); }
+.colophon .contact .sep{ margin:0 10px; color:var(--rule); }
+.page-num{
+  text-align:center;
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--ink-soft);
+  margin-top:40px;
+}
+
+@media (max-width:720px){
+  .page{ padding:48px 28px 60px; margin:0; }
+  .paper-body, .section-meta, .apparatus, .refs{ margin-left:0; }
+  .paper-body p{ text-align:left; hyphens:none; }
+}
+</style>
 </head>
 <body>
-<div class="wrap">
+<div class="page">
 
-  <header class="masthead">
-    <a class="back-link" href="index.html">← Roberto Pecora</a>
-    <p class="eyebrow">4 projects</p>
-    <h1 class="page-title">Applied Data Science &amp; ML</h1>
-    <p class="thesis">
-      Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be, on time rather than on shuffled folds.
-    </p>
-  </header>
+  <div class="running-head">
+    <a href="index.html">← Roberto Pecora</a>
+    <span>Vol. II · Applied Data Science &amp; ML</span>
+  </div>
 
-  <section>
-    <article class="entry" id="kafka-grid-intelligence">
-      <div class="entry-head">
-        <h3 class="entry-title">Real-time grid-stress prediction over Kafka</h3>
-        <span class="repo-name">kafka-grid-intelligence</span>
-      </div>
-      <div class="entry-body">
-        <p>A Kafka pipeline streams Great Britain electricity-demand data to an XGBoost classifier that predicts whether current demand exceeds its trailing 30-day 90th percentile. The model initially achieved a 0.983 ROC-AUC. Because only about 10% of observations are positive, ROC-AUC can overstate performance, so this project focuses on PR-AUC throughout.</p>
-        <p class="subhead">Technique &amp; Impact</p>
-        <p>To test whether the result reflects target leakage or a trivial formulation, the analysis holds the feature set constant while progressively shifting the prediction target forward in time. The findings support neither explanation. Performance instead combines two distinct sources of signal: a short-horizon <em>persistence</em> effect, since electricity demand is highly autocorrelated (≈0.99) and recent observations are strongly predictive at near-term horizons; and a longer-horizon <em>periodicity</em> effect, a forecasting signal that remains even 12 hours ahead, consistent with stable daily and weekly demand cycles.</p>
-        <p class="subhead">Performance Highlights</p>
-        <p>PR-AUC falls from 0.919 at nowcast to 0.629 at 12 hours ahead. Removing the three calendar features collapses it to 0.246, while those three features alone recover 0.515: most of the model's distance skill is the calendar cycle, not the grid dynamics. The full 7-month replay produced 10,174 predictions in Postgres at 84% precision.</p>
-        <div class="entry-table-wrap">
-          <table class="entry-table">
-            <caption>Horizon sweep — same 9 features, same model, same time-ordered split</caption>
-            <thead><tr><th>Horizon</th><th>Lead</th><th>ROC</th><th>PR-AUC</th></tr></thead>
-            <tbody>
-              <tr class="hl-now"><td>0</td><td>now</td><td>0.983</td><td>0.919<span class="bar" style="width:60px"></span></td></tr>
-              <tr><td>2</td><td>1 h</td><td>0.969</td><td>0.863<span class="bar" style="width:56px"></span></td></tr>
-              <tr><td>4</td><td>2 h</td><td>0.929</td><td>0.749<span class="bar" style="width:49px"></span></td></tr>
-              <tr><td>6</td><td>3 h</td><td>0.915</td><td>0.698<span class="bar" style="width:45px"></span></td></tr>
-              <tr><td>8</td><td>4 h</td><td>0.902</td><td>0.642<span class="bar" style="width:42px"></span></td></tr>
-              <tr class="hl-day"><td>24</td><td>12 h</td><td>0.911</td><td>0.629<span class="bar" style="width:41px"></span></td></tr>
-              <tr><td>48</td><td>24 h</td><td>0.909</td><td>0.607<span class="bar" style="width:40px"></span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="entry-table-wrap">
-          <table class="entry-table">
-            <caption>Calendar ablation — horizon 24 · 12 h ahead · test base rate 9.9%</caption>
-            <thead><tr><th>Feature set</th><th>ROC</th><th>PR-AUC</th></tr></thead>
-            <tbody>
-              <tr><td>All 9 features</td><td>0.911</td><td>0.629</td></tr>
-              <tr><td>Calendar removed · 6 feats</td><td>0.733</td><td class="metric-drop">0.246</td></tr>
-              <tr><td>Calendar only · 3 feats</td><td>0.886</td><td class="metric-keep">0.515</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <figure class="entry-figure">
-          <img src="assets/kafka-feature-importance.png" alt="Feature importance chart comparing the nowcast model (dominated by demand_rolling_mean_2h, a persistence feature) against the 12-hour-ahead model (dominated by hour_of_day and is_weekend, calendar features)." loading="lazy">
-          <figcaption>Feature importance, nowcast vs. 12h ahead — persistence dominates near-term, calendar features dominate further out.</figcaption>
-        </figure>
-      </div>
-      <div class="tag-row">
-        <span class="pill">Kafka</span>
-        <span class="pill">XGBoost</span>
-        <span class="pill">MLflow</span>
-        <span class="pill">PR-AUC</span>
-        <span class="pill">Postgres</span>
-      </div>
-      <div class="entry-links">
-        <a class="repo-link" href="https://github.com/Roberto-Pecora/kafka-grid-intelligence" target="_blank" rel="noopener">View repository ↗</a>
-        <a class="repo-link" href="https://claude.ai/code/artifact/3bb53309-70d9-42bc-9b49-b82f1bf7c915" target="_blank" rel="noopener">Read the full audit ↗</a>
-      </div>
-    </article>
+  <div class="masthead">
+    <p class="kicker">Vol. II — 4 projects</p>
+    <h1>Applied Data Science &amp; ML</h1>
+    <p class="abstract">Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be — on time, rather than on shuffled folds. Each entry below states its method before its result.</p>
+  </div>
 
-    <article class="entry" id="nhs-intelligence-mcp">
-      <div class="entry-head">
-        <h3 class="entry-title">MCP server for NHS waiting times &amp; trust quality</h3>
-        <span class="repo-name">nhs-intelligence-mcp</span>
-      </div>
-      <div class="entry-body">
-        <p>Comparing NHS waiting times and trust quality across providers means pulling from three separate, differently-shaped sources by hand. This is an MCP server that exposes that data as deterministic tools, built on top of the dataset the test-driven scraper below produces. There is no LLM inside the server itself, so reasoning happens in the client and the server stays fast and testable.</p>
-        <p class="subhead">Technique &amp; Impact</p>
-        <p>NHS My Planned Care (weekly, via the scraper below), NHS England RTT (monthly), and CQC HSCA Active Locations (monthly) are ingested into a single SQLite database, published as a GitHub release and refreshed by a Sunday CI run that scrapes 130 trusts and publishes a checksummed DB. Five tools, covering lookup, ranking, trend, rating, and a combined profile, read from that database with no network calls at query time.</p>
-        <p class="subhead">Performance Highlights</p>
-        <p>Covers 130 trusts and 74 specialties. A one-line install script downloads the latest database, verifies its SHA-256, and registers the weekly refresh, taking a new user from zero to a working <code>trust_profile</code> query in under a minute.</p>
-        <div class="chart-group" role="img" aria-label="Stat cards: why the tools are useful. Zero network calls at query time. 130 trusts scraped weekly. Five deterministic tools, no LLM inside the server. Under one minute from install to first query.">
-          <div class="chart-group-item">
-            <h4>Query latency</h4>
-            <div class="chart-rows">
-              <div class="chart-row"><span class="row-label">Network calls</span><span class="row-track"></span><span class="row-value">0</span></div>
-            </div>
-          </div>
-          <div class="chart-group-item">
-            <h4>Data freshness</h4>
-            <div class="chart-rows">
-              <div class="chart-row"><span class="row-label">Refresh cycle</span><span class="row-track"></span><span class="row-value">Weekly</span></div>
-            </div>
-          </div>
-          <div class="chart-group-item">
-            <h4>Determinism</h4>
-            <div class="chart-rows">
-              <div class="chart-row"><span class="row-label">LLM calls in server</span><span class="row-track"></span><span class="row-value">0</span></div>
-            </div>
-          </div>
-          <div class="chart-group-item">
-            <h4>Setup time</h4>
-            <div class="chart-rows">
-              <div class="chart-row"><span class="row-label">Install to first query</span><span class="row-track"></span><span class="row-value">&lt;1 min</span></div>
-            </div>
-          </div>
-        </div>
-        <p class="chart-note">Deterministic, pre-fetched data means every query is instant and reproducible: the same question returns the same answer regardless of which LLM client asks it.</p>
-      </div>
-      <div class="tag-row">
-        <span class="pill">MCP</span>
-        <span class="pill">SQLite</span>
-        <span class="pill">GitHub Actions</span>
-        <span class="pill">FastMCP</span>
-      </div>
-      <a class="repo-link" href="https://github.com/Roberto-Pecora/nhs-intelligence-mcp" target="_blank" rel="noopener">View repository ↗</a>
-    </article>
+  <section class="paper-section" id="kafka-grid-intelligence">
+    <div class="section-num"><span class="num">§1</span><h2>Real-time grid-stress prediction over Kafka</h2></div>
+    <p class="section-meta">kafka-grid-intelligence</p>
+    <div class="paper-body">
+      <p>A Kafka pipeline streams Great Britain electricity-demand data to an XGBoost classifier that predicts whether current demand exceeds its trailing 30-day 90th percentile. The model initially achieved a 0.983 ROC-AUC. Because only about 10% of observations are positive, ROC-AUC can overstate performance, so this project focuses on PR-AUC throughout.</p>
+      <p>To test whether the result reflects target leakage or a trivial formulation, the analysis holds the feature set constant while progressively shifting the prediction target forward in time. The findings support neither explanation. Performance instead combines two distinct sources of signal: a short-horizon <em>persistence</em> effect, since electricity demand is highly autocorrelated (≈0.99) and recent observations are strongly predictive at near-term horizons; and a longer-horizon <em>periodicity</em> effect, a forecasting signal that remains even 12 hours ahead, consistent with stable daily and weekly demand cycles.</p>
+      <p>PR-AUC falls from 0.919 at nowcast to 0.629 at 12 hours ahead. Removing the three calendar features collapses it to 0.246, while those three features alone recover 0.515: most of the model's distance skill is the calendar cycle, not the grid dynamics. The full 7-month replay produced 10,174 predictions in Postgres at 84% precision.</p>
 
-    <article class="entry" id="nhs-webscraper">
-      <div class="entry-head">
-        <h3 class="entry-title">Fast and fault tolerant NHS data pipeline</h3>
-        <span class="repo-name">nhs-webscraper</span>
+      <div class="tbl-wrap">
+        <p class="tbl-label">Table 1 — Horizon sweep</p>
+        <table class="paper-table">
+          <thead><tr><th>Horizon</th><th>Lead</th><th>ROC</th><th>PR-AUC</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>now</td><td>0.983</td><td>0.919</td></tr>
+            <tr><td>2</td><td>1 h</td><td>0.969</td><td>0.863</td></tr>
+            <tr><td>4</td><td>2 h</td><td>0.929</td><td>0.749</td></tr>
+            <tr><td>8</td><td>4 h</td><td>0.902</td><td>0.642</td></tr>
+            <tr class="emphasis"><td>24</td><td>12 h</td><td>0.911</td><td>0.629</td></tr>
+            <tr><td>48</td><td>24 h</td><td>0.909</td><td>0.607</td></tr>
+          </tbody>
+        </table>
       </div>
-      <div class="entry-body">
-        <p>NHS My Planned Care exposes specialty waiting times one page at a time, which is fine for a single lookup but useless for cross-trust comparison or trend-tracking. This project turns that per-page tool into a structured, queryable dataset — the same dataset the MCP server above serves to any LLM client.</p>
-        <p class="subhead">Technique &amp; Impact</p>
-        <p>An async-native crawl port matches Crawl4AI's underlying async Playwright, so the pipeline core stays synchronous and testable without fighting the crawl library's own concurrency model. Crawling is isolated behind a swappable backend, so a markup change is just a one-file fix.</p>
-        <p class="subhead">Performance Highlights</p>
-        <p>A preflight canary validates one scraped page against the expected structure and raises <code>LayoutDriftError</code> on mismatch instead of silently ingesting invalid data. The crawler is fault-tolerant, isolating page-level failures, and completes a full run across ~130 trusts and 74 specialties in under three minutes.</p>
-        <div class="chart-group" role="img" aria-label="Stat cards: test coverage 97%, 209 test cases, full run under 3 minutes for 130 trusts.">
-          <div class="chart-group-item">
-            <h4>Test coverage</h4>
-            <div class="chart-rows">
-              <div class="chart-row"><span class="row-label">Statements</span><span class="row-track"></span><span class="row-value">97%</span></div>
-            </div>
-          </div>
-          <div class="chart-group-item">
-            <h4>Test suite</h4>
-            <div class="chart-rows">
-              <div class="chart-row"><span class="row-label">Test cases</span><span class="row-track"></span><span class="row-value">209</span></div>
-            </div>
-          </div>
-          <div class="chart-group-item">
-            <h4>Full run</h4>
-            <div class="chart-rows">
-              <div class="chart-row"><span class="row-label">130 trusts</span><span class="row-track"></span><span class="row-value">&lt;3 min</span></div>
-            </div>
-          </div>
-        </div>
-        <p class="chart-note">Unit tests run on every push; a separate opt-in job hits the live NHS site with real Crawl4AI + Playwright for integration coverage.</p>
-      </div>
-      <div class="tag-row">
-        <span class="pill">Crawl4AI</span>
-        <span class="pill">Ports and adapters</span>
-        <span class="pill">pytest</span>
-        <span class="pill">Async Python</span>
-      </div>
-      <a class="repo-link" href="https://github.com/Roberto-Pecora/nhs-webscraper" target="_blank" rel="noopener">View repository ↗</a>
-    </article>
 
-    <article class="entry" id="actor_critic_financial_rag_repo">
-      <div class="entry-head">
-        <h3 class="entry-title">Actor–critic RAG over SEC filings</h3>
-        <span class="repo-name">actor_critic_financial_rag_repo</span>
-      </div>
-      <div class="entry-body">
-        <p>Cross-filing, longitudinal financial QA is exactly the setting where LLMs are least reliable: retrieval failures and hallucination compound across documents. This system is built to answer such questions without silently guessing when it shouldn't.</p>
-        <p class="subhead">Technique &amp; Impact</p>
-        <p>Qdrant-backed retrieval feeds an actor that drafts an answer with citations; a separate critic model scores that answer against a configurable threshold (0.8 by default) before a controller decides to release or abstain.</p>
-        <p class="subhead">Performance Highlights</p>
-        <p>Live testing surfaced a concrete retrieval failure — a headline figure sitting in the corpus but ranked below boilerplate — which motivated a controlled comparison of four retrieval configurations over the same 44-query golden set, logged to MLflow. A "stronger" embedding model (bge-small-en-v1.5) actually underperformed the baseline; hybrid search (dense + BM25 via Reciprocal Rank Fusion) was the decisive fix, lifting recall@10 by 30%. The critic's abstention gate is not yet benchmarked end-to-end — its scoring model is a small local LLM the project documents as "a weak, noisy signal," so an abstention-rate or precision-lift number isn't reported until that's independently validated.</p>
-        <div class="entry-table-wrap">
-          <table class="entry-table">
-            <caption>Retrieval benchmark — 44-query golden set</caption>
-            <thead><tr><th>Configuration</th><th>Recall@1</th><th>Recall@10</th><th>nDCG@10</th></tr></thead>
-            <tbody>
-              <tr><td>Baseline — dense, all-MiniLM-L6-v2</td><td>0.09</td><td>0.52</td><td>0.24</td></tr>
-              <tr><td>Stronger embedding — bge-small-en-v1.5</td><td>0.00</td><td>0.39</td><td>0.15</td></tr>
-              <tr class="hl-day"><td>Hybrid — dense + BM25 (RRF)</td><td>0.11</td><td>0.68</td><td>0.34</td></tr>
-              <tr><td>Section-aware chunking + hybrid</td><td>0.18</td><td>0.55</td><td>0.35</td></tr>
-            </tbody>
-          </table>
+      <details class="supplement">
+        <summary>Click to view supplementary material — ablation table and feature-importance figure</summary>
+        <div class="supplement-body">
+          <div class="tbl-wrap">
+            <p class="tbl-label">Table 2 — Calendar ablation, H=24</p>
+            <table class="paper-table">
+              <thead><tr><th>Feature set</th><th>ROC</th><th>PR-AUC</th></tr></thead>
+              <tbody>
+                <tr><td>All 9 features</td><td>0.911</td><td>0.629</td></tr>
+                <tr><td>Calendar removed</td><td>0.733</td><td>0.246</td></tr>
+                <tr><td>Calendar only</td><td>0.886</td><td>0.515</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <figure class="fig">
+            <p class="fig-label">Fig. 1</p>
+            <img src="assets/kafka-feature-importance.png" alt="Feature importance chart comparing the nowcast model against the 12-hour-ahead model.">
+            <p class="fig-caption">Feature importance, nowcast vs. 12h ahead. Persistence dominates near-term; calendar features dominate further out.</p>
+          </figure>
         </div>
-      </div>
-      <div class="tag-row">
-        <span class="pill">RAG</span>
-        <span class="pill">SEC EDGAR</span>
-        <span class="pill">FRED</span>
-        <span class="pill">Actor-critic</span>
-        <span class="pill">Docker</span>
-      </div>
-      <a class="repo-link" href="https://github.com/Roberto-Pecora/actor-critic-financial-rag" target="_blank" rel="noopener">View repository ↗</a>
-    </article>
+      </details>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>Kafka · XGBoost · MLflow · PR-AUC · Postgres</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/kafka-grid-intelligence" target="_blank" rel="noopener">Repository</a></div>
   </section>
 
-  <footer>
+  <section class="paper-section" id="nhs-intelligence-mcp">
+    <div class="section-num"><span class="num">§2</span><h2>MCP server for NHS waiting times &amp; trust quality</h2></div>
+    <p class="section-meta">nhs-intelligence-mcp</p>
+    <div class="paper-body">
+      <p>Comparing NHS waiting times and trust quality across providers means pulling from three separate, differently-shaped sources by hand. This is an MCP server that exposes that data as deterministic tools, built on top of the dataset described in §3. There is no LLM inside the server itself, so reasoning happens in the client and the server stays fast and testable.</p>
+      <p>NHS My Planned Care (weekly, via §3), NHS England RTT (monthly), and CQC HSCA Active Locations (monthly) are ingested into a single SQLite database, published as a GitHub release and refreshed by a Sunday CI run that scrapes 130 trusts and publishes a checksummed DB. Five tools — lookup, ranking, trend, rating, and a combined profile — read from that database with no network calls at query time.</p>
+
+      <div class="stat-group">
+        <div class="stat-group-item"><p class="stat-label">Network calls</p><p class="stat-value">0</p></div>
+        <div class="stat-group-item"><p class="stat-label">Refresh cycle</p><p class="stat-value">Weekly</p></div>
+        <div class="stat-group-item"><p class="stat-label">LLM calls in server</p><p class="stat-value">0</p></div>
+        <div class="stat-group-item"><p class="stat-label">Install to first query</p><p class="stat-value">&lt;1 min</p></div>
+      </div>
+      <p class="stat-note">Deterministic, pre-fetched data means every query is instant and reproducible: the same question returns the same answer regardless of which LLM client asks it. Covers 130 trusts and 74 specialties.</p>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>MCP · SQLite · GitHub Actions · FastMCP</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/nhs-intelligence-mcp" target="_blank" rel="noopener">Repository</a></div>
+  </section>
+
+  <section class="paper-section" id="nhs-webscraper">
+    <div class="section-num"><span class="num">§3</span><h2>Fast and fault tolerant NHS data pipeline</h2></div>
+    <p class="section-meta">nhs-webscraper</p>
+    <div class="paper-body">
+      <p>NHS My Planned Care exposes specialty waiting times one page at a time — fine for a single lookup, useless for cross-trust comparison. This project turns that per-page tool into a structured, queryable dataset, the source used in §2.</p>
+      <p>An async-native crawl port matches Crawl4AI's underlying async Playwright, so the pipeline core stays synchronous and testable without fighting the crawl library's own concurrency model. Crawling is isolated behind a swappable backend, so a markup change is just a one-file fix.</p>
+      <p>A preflight canary validates one scraped page against the expected structure and raises <code>LayoutDriftError</code> on mismatch instead of silently ingesting invalid data. The crawler is fault-tolerant, isolating page-level failures, and completes a full run across ~130 trusts and 74 specialties in under three minutes.</p>
+
+      <div class="stat-group">
+        <div class="stat-group-item"><p class="stat-label">Test coverage</p><p class="stat-value">97%</p></div>
+        <div class="stat-group-item"><p class="stat-label">Test cases</p><p class="stat-value">209</p></div>
+        <div class="stat-group-item"><p class="stat-label">Full run, 130 trusts</p><p class="stat-value">&lt;3 min</p></div>
+      </div>
+      <p class="stat-note">Unit tests run on every push; a separate opt-in job hits the live NHS site with real Crawl4AI + Playwright for integration coverage.</p>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>Crawl4AI · Ports and adapters · pytest · Async Python</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/nhs-webscraper" target="_blank" rel="noopener">Repository</a></div>
+  </section>
+
+  <section class="paper-section" id="actor_critic_financial_rag_repo">
+    <div class="section-num"><span class="num">§4</span><h2>Actor–critic RAG over SEC filings</h2></div>
+    <p class="section-meta">actor_critic_financial_rag_repo</p>
+    <div class="paper-body">
+      <p>Cross-filing, longitudinal financial QA is exactly the setting where LLMs are least reliable: retrieval failures and hallucination compound across documents. This system is built to answer such questions without silently guessing when it shouldn't.</p>
+      <p>Qdrant-backed retrieval feeds an actor that drafts an answer with citations; a separate critic model scores that answer against a configurable threshold (0.8 by default) before a controller decides to release or abstain.</p>
+      <p>Live testing surfaced a concrete retrieval failure — a headline figure sitting in the corpus but ranked below boilerplate — which motivated a controlled comparison of four retrieval configurations over a 44-query golden set, logged to MLflow. A "stronger" embedding model underperformed the baseline; hybrid search (dense + BM25, Reciprocal Rank Fusion) was the decisive fix. The critic's abstention gate is not yet benchmarked end-to-end — its scoring model is a small local LLM the project documents as "a weak, noisy signal," so an abstention-rate or precision-lift number isn't reported until that's independently validated.</p>
+
+      <div class="tbl-wrap">
+        <p class="tbl-label">Table 3 — Retrieval benchmark, 44-query golden set</p>
+        <table class="paper-table">
+          <thead><tr><th>Configuration</th><th>R@1</th><th>R@10</th><th>nDCG@10</th></tr></thead>
+          <tbody>
+            <tr><td>Baseline, dense</td><td>0.09</td><td>0.52</td><td>0.24</td></tr>
+            <tr><td>Stronger embedding</td><td>0.00</td><td>0.39</td><td>0.15</td></tr>
+            <tr class="emphasis"><td>Hybrid (RRF)</td><td>0.11</td><td>0.68</td><td>0.34</td></tr>
+            <tr><td>Section-aware + hybrid</td><td>0.18</td><td>0.55</td><td>0.35</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>RAG · SEC EDGAR · FRED · Actor-critic · Docker</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/actor-critic-financial-rag" target="_blank" rel="noopener">Repository</a></div>
+  </section>
+
+  <div class="colophon">
     <h2>Get in touch</h2>
     <p>If you want to talk about challenging AI/ML projects, opportunities, or collaborations.</p>
-    <div class="contact-row">
-      <a class="btn primary" href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">Message on LinkedIn</a>
-      <a class="btn" href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">Browse the code</a>
-    </div>
-    <p class="foot-note">Every project above is real, inspectable code: open a repository to see how a specific result was produced.</p>
-  </footer>
+    <p class="contact">
+      <a href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">Message on LinkedIn</a>
+      <span class="sep">·</span>
+      <a href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">Browse the code</a>
+    </p>
+  </div>
+
+  <p class="page-num">— 2 —</p>
 
 </div>
 </body>

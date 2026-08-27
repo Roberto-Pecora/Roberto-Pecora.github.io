@@ -6,147 +6,294 @@
 <title>Roberto Pecora</title>
 <meta name="description" content="Senior data scientist working on LLM post-training, RLHF, and production ML systems.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="styles.css?v=1787861827">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper: #EFEBE1;
+  --paper-shadow: #E4DFD1;
+  --ink: #1C1A15;
+  --ink-soft: #4A4638;
+  --rule: #C9C2AB;
+  --rule-heavy: #1C1A15;
+  --accent-ink: #6B2E2E;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', 'SF Mono', Menlo, monospace;
+}
+*{ box-sizing: border-box; }
+body{
+  margin:0;
+  background:var(--paper-shadow);
+  color:var(--ink);
+  font-family:var(--serif);
+  -webkit-font-smoothing:antialiased;
+}
+a{ color:inherit; }
+
+.page{
+  max-width:900px;
+  margin:48px auto;
+  background:var(--paper);
+  padding:72px 88px 88px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.14);
+}
+
+.masthead{
+  text-align:center;
+  padding-bottom:36px;
+  margin-bottom:48px;
+  border-bottom:3px double var(--rule-heavy);
+}
+.masthead .issue{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 20px;
+}
+.masthead h1{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:2.9rem;
+  letter-spacing:-0.01em;
+  margin:0 0 10px;
+}
+.masthead .subtitle{
+  font-size:1.05rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  max-width:52ch;
+  margin:0 auto 20px;
+  line-height:1.5;
+}
+.masthead .links{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--ink-soft);
+  text-align:left;
+}
+.masthead .links a{ text-decoration:underline; text-decoration-color:var(--rule); text-underline-offset:2px; }
+.masthead .links a:hover{ color:var(--accent-ink); text-decoration-color:var(--accent-ink); }
+.masthead .links .sep{ margin:0 10px; color:var(--rule); }
+
+.volume{ margin-bottom:52px; }
+.volume:last-of-type{ margin-bottom:0; }
+.volume-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  border-bottom:1px solid var(--rule-heavy);
+  padding-bottom:8px;
+  margin-bottom:6px;
+}
+.volume-head h2{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:1.3rem;
+  margin:0;
+  letter-spacing:-0.005em;
+}
+.volume-head .count{
+  font-family:var(--mono);
+  font-size:10.5px;
+  color:var(--ink-soft);
+}
+.volume-note{
+  font-size:0.92rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  max-width:64ch;
+  margin:0 0 22px;
+  line-height:1.55;
+}
+
+.toc-entry{
+  display:block;
+  padding:14px 0;
+  border-bottom:1px solid var(--rule);
+  text-decoration:none;
+  color:inherit;
+}
+.toc-entry:last-child{ border-bottom:none; }
+.toc-row{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.toc-num{
+  font-family:var(--mono);
+  font-size:0.85rem;
+  color:var(--accent-ink);
+  flex-shrink:0;
+  width:24px;
+}
+.toc-title{
+  font-family:var(--serif);
+  font-size:1.08rem;
+  font-weight:500;
+  flex-shrink:0;
+}
+.toc-leader{
+  flex:1;
+  border-bottom:1px dotted var(--rule);
+  transform:translateY(-4px);
+  min-width:20px;
+}
+.toc-stat{
+  font-family:var(--mono);
+  font-size:0.82rem;
+  color:var(--accent-ink);
+  flex-shrink:0;
+  white-space:nowrap;
+}
+.toc-hook{
+  font-size:0.9rem;
+  color:var(--ink-soft);
+  margin:6px 0 0 34px;
+  max-width:60ch;
+  line-height:1.55;
+}
+.toc-entry:hover .toc-title{ color:var(--accent-ink); }
+.toc-entry:hover .toc-leader{ border-bottom-color:var(--accent-ink); }
+
+.volume-more{
+  margin-top:16px;
+  font-family:var(--mono);
+  font-size:11.5px;
+  color:var(--ink-soft);
+}
+.volume-more a{ text-decoration:underline; text-decoration-color:var(--rule); text-underline-offset:2px; }
+.volume-more a:hover{ color:var(--accent-ink); text-decoration-color:var(--accent-ink); }
+
+.colophon{
+  margin-top:64px;
+  padding-top:28px;
+  border-top:3px double var(--rule-heavy);
+  text-align:center;
+}
+.colophon h2{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:1.3rem;
+  margin:0 0 12px;
+}
+.colophon p{
+  font-size:0.92rem;
+  color:var(--ink-soft);
+  max-width:48ch;
+  margin:0 auto 16px;
+  font-style:italic;
+}
+.colophon .contact{
+  font-family:var(--mono);
+  font-size:11.5px;
+  font-style:normal;
+}
+.colophon .contact a{ text-decoration:underline; text-decoration-color:var(--rule); text-underline-offset:2px; }
+.colophon .contact a:hover{ color:var(--accent-ink); text-decoration-color:var(--accent-ink); }
+.colophon .contact .sep{ margin:0 10px; color:var(--rule); }
+
+@media (max-width:720px){
+  .page{ padding:48px 24px 56px; margin:0; }
+  .toc-row{ flex-wrap:wrap; }
+  .toc-leader{ display:none; }
+  .toc-hook{ margin-left:0; }
+}
+</style>
 </head>
 <body>
-<div class="wrap">
+<div class="page">
 
-  <header class="masthead">
-    <p class="eyebrow">Portfolio: LLM Post-Training &amp; Applied Data Science</p>
-    <h1 class="name">Roberto Pecora</h1>
-    <p class="thesis">
-      Senior data scientist with a keen interest in LLM post-training, agentic AI, and cutting-edge research.
+  <div class="masthead">
+    <p class="issue">Portfolio · No. 1</p>
+    <h1>Roberto Pecora</h1>
+    <p class="subtitle">Old-fashioned senior data scientist with a keen interest in LLM post-training, agentic AI, and cutting-edge research.</p>
+    <p class="links">
+      <a href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">GitHub</a>
+      <span class="sep">·</span>
+      <a href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">LinkedIn</a>
     </p>
-    <nav class="links">
-      <a href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">GitHub ↗</a>
-      <a href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">LinkedIn ↗</a>
-    </nav>
-  </header>
+  </div>
 
-  <!-- ================= RLHF / POST-TRAINING ================= -->
-  <section>
-    <div class="section-head">
-      <h2>LLM Post-Training &amp; RLHF Research</h2>
-      <span class="tag">5 studies</span>
+  <section class="volume">
+    <div class="volume-head">
+      <h2>Vol. I — LLM Post-Training &amp; RLHF Research</h2>
+      <span class="count">5 studies</span>
     </div>
-    <p class="section-note">
-      Controlled experimental studies of post-training methods for modern instruction-tuned language models, including supervised fine-tuning, preference optimisation, and reinforcement learning from verifiable and human-derived rewards. Each study isolates a single variable and reports uncertainty using bootstrap confidence intervals or paired statistical tests instead of single-run point estimates.
-    </p>
+    <p class="volume-note">Controlled experimental studies of post-training methods for modern instruction-tuned language models, including supervised fine-tuning, preference optimisation, and reinforcement learning from verifiable and human-derived rewards.</p>
 
-    <div class="card-grid">
-      <a class="card" href="rlhf.html#grpo-math-reasoning">
-        <div class="card-top">
-          <span class="card-title">GRPO vs. SFT on verifiable math reward</span>
-          <span class="card-stat">+9.9 pts, p&lt;4e-4</span>
-        </div>
-        <p class="card-hook">GRPO beats SFT on math problems with a checkable reward, but regresses 43 problems SFT had already solved.</p>
-        <div class="card-pills">
-          <span class="pill">GRPO</span>
-          <span class="pill">Qwen2.5-1.5B</span>
-          <span class="pill">McNemar test</span>
-        </div>
-      </a>
-
-      <a class="card" href="rlhf.html#rloo-vs-ppo-rlhf">
-        <div class="card-top">
-          <span class="card-title">Reproducing RLOO vs. PPO with Claude as judge</span>
-          <span class="card-stat">PPO 3× SFT win rate</span>
-        </div>
-        <p class="card-hook">Reruns a published RLHF comparison on the original checkpoints, swapping the GPT-4 judge for Claude, and surfaces a stylistic confound the win-rate gap would otherwise hide.</p>
-        <div class="card-pills">
-          <span class="pill">RLOO</span>
-          <span class="pill">PPO</span>
-          <span class="pill">Claude-as-judge</span>
-        </div>
-      </a>
-
-      <a class="card" href="rlhf.html#qwen3-financial-sft-unsloth-dpo">
-        <div class="card-top">
-          <span class="card-title">Financial LLM post-training: SFT → DPO on Qwen3-4B</span>
-          <span class="card-stat">27× arithmetic gain</span>
-        </div>
-        <p class="card-hook">Trains a small open model to answer numeric questions grounded in real filings; the aggregate score hides a real tradeoff between arithmetic and extraction accuracy.</p>
-        <div class="card-pills">
-          <span class="pill">Qwen3-4B</span>
-          <span class="pill">QLoRA</span>
-          <span class="pill">DPO</span>
-        </div>
-      </a>
-    </div>
-
-    <a class="explore-link" href="rlhf.html">
-      Explore all RLHF &amp; post-training studies
-      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <a class="toc-entry" href="rlhf.html#grpo-math-reasoning">
+      <div class="toc-row">
+        <span class="toc-num">§1</span>
+        <span class="toc-title">GRPO vs. SFT on verifiable math reward</span>
+        <span class="toc-leader"></span>
+        <span class="toc-stat">+9.9 pts, p&lt;4e-4</span>
+      </div>
+      <p class="toc-hook">GRPO beats SFT on math problems with a checkable reward, but regresses 43 problems SFT had already solved.</p>
     </a>
+
+    <a class="toc-entry" href="rlhf.html#rloo-vs-ppo-rlhf">
+      <div class="toc-row">
+        <span class="toc-num">§2</span>
+        <span class="toc-title">Reproducing RLOO vs. PPO with Claude as judge</span>
+        <span class="toc-leader"></span>
+        <span class="toc-stat">PPO 3× SFT win rate</span>
+      </div>
+      <p class="toc-hook">Reruns a published RLHF comparison on the original checkpoints, swapping the GPT-4 judge for Claude.</p>
+    </a>
+
+    <a class="toc-entry" href="rlhf.html#qwen3-financial-sft-unsloth-dpo">
+      <div class="toc-row">
+        <span class="toc-num">§3</span>
+        <span class="toc-title">Financial LLM post-training: SFT → DPO on Qwen3-4B</span>
+        <span class="toc-leader"></span>
+        <span class="toc-stat">27× arithmetic gain</span>
+      </div>
+      <p class="toc-hook">Trains a small open model to answer numeric questions grounded in real filings; the aggregate score hides a real tradeoff.</p>
+    </a>
+
+    <p class="volume-more">+2 more studies — <a href="rlhf.html">read Vol. I in full →</a></p>
   </section>
 
-  <!-- ================= APPLIED DS/ML ================= -->
-  <section>
-    <div class="section-head">
-      <h2>Applied Data Science &amp; ML</h2>
-      <span class="tag">4 projects</span>
+  <section class="volume">
+    <div class="volume-head">
+      <h2>Vol. II — Applied Data Science &amp; ML</h2>
+      <span class="count">4 projects</span>
     </div>
-    <p class="section-note">
-      Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be, on time rather than on shuffled folds.
-    </p>
+    <p class="volume-note">Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be, on time rather than on shuffled folds.</p>
 
-    <div class="card-grid">
-      <a class="card" href="applied-ml.html#kafka-grid-intelligence">
-        <div class="card-top">
-          <span class="card-title">Real-time grid-stress prediction over Kafka</span>
-          <span class="card-stat">84% precision</span>
-        </div>
-        <p class="card-hook">Streams GB grid demand and generation-mix data through Kafka, scores it live with an XGBoost classifier, and writes predictions to Postgres for a live dashboard.</p>
-        <div class="card-pills">
-          <span class="pill">Kafka</span>
-          <span class="pill">XGBoost</span>
-          <span class="pill">PR-AUC</span>
-        </div>
-      </a>
-
-      <a class="card" href="applied-ml.html#nhs-intelligence-mcp">
-        <div class="card-top">
-          <span class="card-title">MCP server for NHS waiting times &amp; trust quality</span>
-          <span class="card-stat">130 trusts, 74 specialties</span>
-        </div>
-        <p class="card-hook">Exposes deterministic data tools to Claude and any MCP client; no LLM inside the server, no network calls at query time, refreshed weekly via CI.</p>
-        <div class="card-pills">
-          <span class="pill">MCP</span>
-          <span class="pill">SQLite</span>
-          <span class="pill">GitHub Actions</span>
-        </div>
-      </a>
-
-      <a class="card" href="applied-ml.html#actor_critic_financial_rag_repo">
-        <div class="card-top">
-          <span class="card-title">Actor–critic RAG over SEC filings</span>
-          <span class="card-stat">Abstains below 0.8</span>
-        </div>
-        <p class="card-hook">A critic model vetoes low-confidence answers into explicit abstention, on the premise that a wrong answer costs more than no answer.</p>
-        <div class="card-pills">
-          <span class="pill">RAG</span>
-          <span class="pill">SEC EDGAR</span>
-          <span class="pill">Actor-critic</span>
-        </div>
-      </a>
-    </div>
-
-    <a class="explore-link" href="applied-ml.html">
-      Explore all Applied Data Science &amp; ML projects
-      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <a class="toc-entry" href="applied-ml.html#kafka-grid-intelligence">
+      <div class="toc-row">
+        <span class="toc-num">§1</span>
+        <span class="toc-title">Real-time grid-stress prediction over Kafka</span>
+        <span class="toc-leader"></span>
+        <span class="toc-stat">84% precision</span>
+      </div>
+      <p class="toc-hook">Streams GB grid demand through Kafka, scores it live with XGBoost, and writes predictions to Postgres for a live dashboard.</p>
     </a>
+
+    <a class="toc-entry" href="applied-ml.html#actor_critic_financial_rag_repo">
+      <div class="toc-row">
+        <span class="toc-num">§2</span>
+        <span class="toc-title">Actor–critic RAG over SEC filings</span>
+        <span class="toc-leader"></span>
+        <span class="toc-stat">Recall@10 +30%</span>
+      </div>
+      <p class="toc-hook">A critic model gates the actor's cited answers against a confidence threshold, abstaining rather than guessing on low-confidence responses.</p>
+    </a>
+
+    <p class="volume-more">+2 more projects — <a href="applied-ml.html">read Vol. II in full →</a></p>
   </section>
 
-  <footer>
+  <div class="colophon">
     <h2>Get in touch</h2>
     <p>If you want to talk about challenging AI/ML projects, opportunities, or collaborations.</p>
-    <div class="contact-row">
-      <a class="btn primary" href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">Message on LinkedIn</a>
-      <a class="btn" href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">Browse the code</a>
-    </div>
-    <p class="foot-note">Every project above is real, inspectable code: open a repository to see how a specific result was produced.</p>
-  </footer>
+    <p class="contact">
+      <a href="https://www.linkedin.com/in/roberto-pecora-778a632" target="_blank" rel="noopener">Message on LinkedIn</a>
+      <span class="sep">·</span>
+      <a href="https://github.com/Roberto-Pecora" target="_blank" rel="noopener">Browse the code</a>
+    </p>
+  </div>
 
 </div>
 </body>
