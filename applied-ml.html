@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Applied Data Science &amp; ML — Roberto Pecora</title>
-<meta name="description" content="Production-shaped ML work: real-time grid-stress prediction, an NHS data MCP server and pipeline, and actor-critic RAG over SEC filings.">
+<meta name="description" content="Production-shaped ML work: real-time grid-stress prediction, an NHS data MCP server and pipeline, actor-critic RAG over SEC filings, and a model-agnostic agent evaluated on grounded NHS tool use.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -331,7 +331,7 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
   </div>
 
   <div class="masthead">
-    <p class="kicker">Vol. II — 4 projects</p>
+    <p class="kicker">Vol. II — 5 projects</p>
     <h1>Applied Data Science &amp; ML</h1>
     <p class="abstract">Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be — on time, rather than on shuffled folds. Each entry below states its method before its result.</p>
   </div>
@@ -446,6 +446,38 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     </div>
     <div class="apparatus"><span class="label">Stack</span>RAG · SEC EDGAR · FRED · Actor-critic · Docker</div>
     <div class="refs"><a href="https://github.com/Roberto-Pecora/actor-critic-financial-rag" target="_blank" rel="noopener">Repository</a></div>
+  </section>
+
+  <section class="paper-section" id="nhs-care-access-agent">
+    <div class="section-num"><span class="num">§5</span><h2>Evaluating models on grounded NHS tool use</h2></div>
+    <p class="section-meta">nhs-care-access-agent</p>
+    <div class="paper-body">
+      <p>An MCP server makes trustworthy tools available; it does not prove a model will choose the right tool, pass valid arguments, read the result correctly, or abstain when the data is missing. This project builds a model-agnostic research agent over the read-only server from §2 and evaluates those behaviours separately, instead of treating a fluent answer as evidence of reliability.</p>
+      <p>The agent is a small, inspectable multi-turn tool-use loop with turn and tool-call budgets. The same loop drives local open-weight models through Ollama, Gemini, and any OpenAI-compatible hosted endpoint. A deterministic evaluator runs a frozen task set — eight cases spanning direct lookup, ranking, a joined profile, a twelve-month trend, and three abstention or misleading-premise prompts — whose expected facts are pinned to a specific database snapshot by SHA-256, so a data change is caught rather than silently rescored.</p>
+      <p>Model size dominated. A local 3B model reached 37.5% task pass: it emitted tool calls as literal text without invoking them, passed malformed arguments, and confirmed a false premise by agreeing a 31-week wait was one of the shortest in England. Two larger free hosted models both selected the correct tool on every case and abstained correctly on missing data. Two <em>scoring</em> gaps surfaced honestly in the write-up rather than tuned away: a keyword-based abstention check under-counts naturally phrased refusals, and pinning one required tool penalises a correct answer reached by a valid alternate path.</p>
+
+      <div class="tbl-wrap">
+        <p class="tbl-label">Table 4 — Frozen task set, 8 cases, pinned snapshot</p>
+        <table class="paper-table">
+          <thead><tr><th>Model</th><th>Pass</th><th>Factual</th><th>Tool select</th></tr></thead>
+          <tbody>
+            <tr class="emphasis"><td>Nemotron-3 Super 120B</td><td>87.5%</td><td>100%</td><td>100%</td></tr>
+            <tr><td>MiniMax M3</td><td>75.0%</td><td>87.5%</td><td>100%</td></tr>
+            <tr><td>Llama 3.2 3B (local)</td><td>37.5%</td><td>50.0%</td><td>62.5%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="fig">
+        <p class="fig-label">Fig. 2</p>
+        <img src="assets/nhs-agent-benchmark.png" alt="Grouped bar chart of task pass, factual correctness, and tool-selection rates for the three models. The two larger hosted models cluster near the top; the local 3B is markedly lower on every metric.">
+        <p class="fig-caption">Task pass, factual correctness, and tool-selection across the eight-case frozen set. The two larger models reach 100% tool-selection; the local 3B trails on every metric.</p>
+      </figure>
+
+      <p class="stat-note">Every run emits a portable JSONL trace; the evaluator scores known facts, tool selection, tool budget, and safe abstention, and reports p50/p95 latency. Only tool names the connected MCP server exposes are callable, and all NHS tools are read-only.</p>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>MCP · Model-agnostic adapters · Ollama · OpenRouter · Deterministic eval</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/nhs-care-access-agent" target="_blank" rel="noopener">Repository</a></div>
   </section>
 
   <div class="colophon">
