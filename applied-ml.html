@@ -453,30 +453,32 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     <p class="section-meta">nhs-care-access-agent</p>
     <div class="paper-body">
       <p>An MCP server makes trustworthy tools available; it does not prove a model will choose the right tool, pass valid arguments, read the result correctly, or abstain when the data is missing. This project builds a model-agnostic research agent over the read-only server from §2 and evaluates those behaviours separately, instead of treating a fluent answer as evidence of reliability.</p>
-      <p>The agent is a small, inspectable multi-turn tool-use loop with turn and tool-call budgets. The same loop drives local open-weight models through Ollama, Gemini, and any OpenAI-compatible hosted endpoint. A deterministic evaluator runs a frozen task set — eight cases spanning direct lookup, ranking, a joined profile, a twelve-month trend, and three abstention or misleading-premise prompts — whose expected facts are pinned to a specific database snapshot by SHA-256, so a data change is caught rather than silently rescored.</p>
-      <p>Model size dominated. A local 3B model reached 37.5% task pass: it emitted tool calls as literal text without invoking them, passed malformed arguments, and confirmed a false premise by agreeing a 31-week wait was one of the shortest in England. Two larger free hosted models both selected the correct tool on every case and abstained correctly on missing data. Two <em>scoring</em> gaps surfaced honestly in the write-up rather than tuned away: a keyword-based abstention check under-counts naturally phrased refusals, and pinning one required tool penalises a correct answer reached by a valid alternate path.</p>
+      <p>The agent is a small, inspectable multi-turn tool-use loop with turn and tool-call budgets. One loop drives four interchangeable adapters — Claude, a local open-weight model through Ollama, and hosted open models — over the same tools and the same task set. A deterministic evaluator runs a frozen set of eight cases (direct lookup, ranking, a joined profile, a twelve-month trend, and three abstention or misleading-premise prompts) whose expected facts are pinned to one database snapshot by SHA-256, so a data change is caught rather than silently rescored. Each model runs the set five times: agents are stochastic, and a single pass over eight cases is a point estimate with no error bar.</p>
+      <p>Running five times changes the reading. The frontier model, Claude Sonnet 5, sets a clean ceiling at 97.5% — and its one recurring miss is not a capability gap but the evaluator's own keyword-based abstention check failing to match a correctly hedged refusal. Nemotron-3 Super, which a single run had put at 87.5%, is really 77.5% ± 10.5: the point estimate had caught a good day, and its true spread is the widest of the four. MiniMax matches it on accuracy but is three times slower (16s median vs. 5s). The local 3B model is perfectly deterministic at 37.5% — it fails the same five cases every run: emitting tool calls as literal text without invoking them, passing malformed arguments, and confirming a false premise by agreeing a 31-week wait was one of the shortest in England. Its failures are systematic, not unlucky.</p>
+      <p>The most useful output is what the harness caught about itself. Two <em>scoring</em> gaps are reported rather than tuned away: the keyword abstention check under-counts naturally phrased refusals — the single largest distortion, and the reason even Sonnet drops below 100% — and pinning one required tool penalises a correct answer reached by a valid alternate path. An eval that surfaces its own measurement error is worth more than one that reports a flattering number.</p>
 
       <div class="tbl-wrap">
-        <p class="tbl-label">Table 4 — Frozen task set, 8 cases, pinned snapshot</p>
+        <p class="tbl-label">Table 4 — Frozen task set, 8 cases, n=5 (mean ± sample sd)</p>
         <table class="paper-table">
-          <thead><tr><th>Model</th><th>Pass</th><th>Factual</th><th>Tool select</th></tr></thead>
+          <thead><tr><th>Model</th><th>Pass</th><th>Factual</th><th>Tool select</th><th>p50 ms</th></tr></thead>
           <tbody>
-            <tr class="emphasis"><td>Nemotron-3 Super 120B</td><td>87.5%</td><td>100%</td><td>100%</td></tr>
-            <tr><td>MiniMax M3</td><td>75.0%</td><td>87.5%</td><td>100%</td></tr>
-            <tr><td>Llama 3.2 3B (local)</td><td>37.5%</td><td>50.0%</td><td>62.5%</td></tr>
+            <tr class="emphasis"><td>Claude Sonnet 5</td><td>97.5 ± 5.6</td><td>100 ± 0</td><td>100 ± 0</td><td>4900</td></tr>
+            <tr><td>Nemotron-3 Super 120B</td><td>77.5 ± 10.5</td><td>95.0 ± 6.8</td><td>100 ± 0</td><td>6900</td></tr>
+            <tr><td>MiniMax M3</td><td>77.5 ± 5.6</td><td>87.5 ± 0</td><td>97.5 ± 5.6</td><td>16000</td></tr>
+            <tr><td>Llama 3.2 3B (local)</td><td>37.5 ± 0</td><td>50.0 ± 0</td><td>62.5 ± 0</td><td>4900</td></tr>
           </tbody>
         </table>
       </div>
 
       <figure class="fig">
         <p class="fig-label">Fig. 2</p>
-        <img src="assets/nhs-agent-benchmark.png" alt="Grouped bar chart of task pass, factual correctness, and tool-selection rates for the three models. The two larger hosted models cluster near the top; the local 3B is markedly lower on every metric.">
-        <p class="fig-caption">Task pass, factual correctness, and tool-selection across the eight-case frozen set. The two larger models reach 100% tool-selection; the local 3B trails on every metric.</p>
+        <img src="assets/nhs-agent-benchmark.png" alt="Grouped bar chart with error bars of task pass, factual correctness, and tool-selection rates for four models over five runs each. Claude Sonnet 5 leads near 100%, the two open hosted models sit around 78% with wider error bars, and the local 3B trails at 37.5% with no variance.">
+        <p class="fig-caption">Task pass, factual correctness, and tool-selection over five runs each (error bars: sample sd). Note Nemotron's wide task-pass interval and the 3B's zero variance — its failures are systematic, not sampled.</p>
       </figure>
 
-      <p class="stat-note">Every run emits a portable JSONL trace; the evaluator scores known facts, tool selection, tool budget, and safe abstention, and reports p50/p95 latency. Only tool names the connected MCP server exposes are callable, and all NHS tools are read-only.</p>
+      <p class="stat-note">Every run emits a portable JSONL trace; the evaluator scores known facts, tool selection, tool budget, and safe abstention, and reports p50/p95 latency. Runs are at temperature 0 where the provider allows it (Claude runs at its default, temperature being deprecated there). Only tool names the connected MCP server exposes are callable, and all NHS tools are read-only.</p>
     </div>
-    <div class="apparatus"><span class="label">Stack</span>MCP · Model-agnostic adapters · Ollama · OpenRouter · Deterministic eval</div>
+    <div class="apparatus"><span class="label">Stack</span>MCP · Model-agnostic adapters · Claude · Ollama · OpenRouter · Deterministic eval</div>
     <div class="refs"><a href="https://github.com/Roberto-Pecora/nhs-care-access-agent" target="_blank" rel="noopener">Repository</a></div>
   </section>
 
