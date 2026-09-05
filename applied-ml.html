@@ -331,7 +331,7 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
   </div>
 
   <div class="masthead">
-    <p class="kicker">Vol. II — 5 projects</p>
+    <p class="kicker">Vol. II — 6 projects</p>
     <h1>Applied Data Science &amp; ML</h1>
     <p class="abstract">Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be — on time, rather than on shuffled folds. Each entry below states its method before its result.</p>
   </div>
@@ -448,8 +448,32 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     <div class="refs"><a href="https://github.com/Roberto-Pecora/actor-critic-financial-rag" target="_blank" rel="noopener">Repository</a></div>
   </section>
 
+  <section class="paper-section" id="financial-rag-aws">
+    <div class="section-num"><span class="num">§5</span><h2>Retrieval-first financial RAG on AWS</h2></div>
+    <p class="section-meta">financial-rag-aws</p>
+    <div class="paper-body">
+      <p>The predecessor in §4 established a counter-intuitive result: on financial tables a &ldquo;stronger&rdquo; embedding model lost to the baseline, and hybrid dense-plus-BM25 retrieval was the decisive fix. This project takes that finding to a full AWS data plane and treats retrieval as a measurable engineering problem rather than a leaderboard exercise. It ingests the messy documents analysts actually use &mdash; text PDFs, linearised tables, Textract OCR for scans, and SEC HTML &mdash; into content-hash-keyed chunks over S3 and one small OpenSearch node that runs dense k-NN and BM25 fused with Reciprocal Rank Fusion, followed by a corpus-trained cross-encoder reranker. The actor cites retrieved evidence or abstains; every figure in an answer is traced back to a supporting passage, and any that matches no passage is flagged.</p>
+      <p>Some credit questions need structure rather than a relevant paragraph. A property graph extracts issuer, instrument, and covenant relationships &mdash; deterministic gazetteer matching for stable entities, schema-guided LLM extraction for covenants &mdash; and serves them behind the same <code>{text, metadata, score}</code> contract as chunk retrieval, so the application switches backends without touching answer generation. A small, inspectable agent tool-loop composes retrieval, graph lookup, and arithmetic for multi-hop questions under turn and tool-call budgets. Retrieved text is demarcated as untrusted data with sanitised delimiters, so a document cannot inject instructions into the prompt.</p>
+      <p>Running the system live surfaced two failures the aggregate score hid. Retrieval drifted off the named company when a metric phrase dominated the query &mdash; &ldquo;Amazon operating cash flow&rdquo; returned other issuers&rsquo; cash-flow passages &mdash; fixed by extracting the entity and constraining retrieval with a metadata filter. And a from-scratch embedding comparison, run on a Colab GPU over FinanceBench, reproduced the predecessor&rsquo;s finding at larger scale: the mid-size <code>bge-base</code> beat both the smaller <code>bge-small</code> and the larger <code>bge-large</code>. Bigger did not help. The training and reranking artifacts are scaffolded and scored by the ablation runner but not finalised; the figures below are retrieval recall on a deliberately strict content-match harness, not comparable to public leaderboards.</p>
+
+      <div class="tbl-wrap">
+        <p class="tbl-label">Table 4 &mdash; Embedding ablation, FinanceBench (150 queries, GPU)</p>
+        <table class="paper-table">
+          <thead><tr><th>Embedding model</th><th>R@1</th><th>R@5</th><th>R@10</th></tr></thead>
+          <tbody>
+            <tr><td>bge-small (33M)</td><td>0.050</td><td>0.107</td><td>0.227</td></tr>
+            <tr class="emphasis"><td>bge-base (109M)</td><td>0.084</td><td>0.175</td><td>0.245</td></tr>
+            <tr><td>bge-large (335M)</td><td>0.060</td><td>0.109</td><td>0.218</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>RAG · OpenSearch · Terraform · graphRAG · Pydantic · OpenRouter</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/financial-rag-aws" target="_blank" rel="noopener">Repository</a></div>
+  </section>
+
   <section class="paper-section" id="nhs-care-access-agent">
-    <div class="section-num"><span class="num">§5</span><h2>Evaluating models on grounded NHS tool use</h2></div>
+    <div class="section-num"><span class="num">§6</span><h2>Evaluating models on grounded NHS tool use</h2></div>
     <p class="section-meta">nhs-care-access-agent</p>
     <div class="paper-body">
       <p>An MCP server makes trustworthy tools available; it does not prove a model will choose the right tool, pass valid arguments, read the result correctly, or abstain when the data is missing. This project builds a model-agnostic research agent over the read-only server from §2 and evaluates those behaviours separately, instead of treating a fluent answer as evidence of reliability.</p>
