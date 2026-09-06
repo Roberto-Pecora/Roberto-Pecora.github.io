@@ -331,7 +331,7 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
   </div>
 
   <div class="masthead">
-    <p class="kicker">Vol. II — 6 projects</p>
+    <p class="kicker">Vol. II — 7 projects</p>
     <h1>Applied Data Science &amp; ML</h1>
     <p class="abstract">Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be — on time, rather than on shuffled folds. Each entry below states its method before its result.</p>
   </div>
@@ -504,6 +504,30 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     </div>
     <div class="apparatus"><span class="label">Stack</span>MCP · Model-agnostic adapters · Claude · Ollama · OpenRouter · Deterministic eval</div>
     <div class="refs"><a href="https://github.com/Roberto-Pecora/nhs-care-access-agent" target="_blank" rel="noopener">Repository</a></div>
+  </section>
+
+  <section class="paper-section" id="financial-rag-langgraph">
+    <div class="section-num"><span class="num">§7</span><h2>Financial RAG on LangGraph, and finishing what §5 left open</h2></div>
+    <p class="section-meta">financial-rag-langgraph</p>
+    <div class="paper-body">
+      <p>§5 flagged its training and reranking artifacts as scaffolded but not finalised. This project is a cloud-optional re-architecture of that pipeline onto LangGraph, and it closes that thread with a measured result rather than a scaffold: fine-tuning the embedding model on the target corpus, not a larger general-purpose model, is what moves retrieval. The orchestration itself changes too. Corrective retrieval, an actor–critic gate, and a router that sends multi-hop questions to a tool-using agent are all control flow with cycles and branches; expressing them as a stateful graph rather than nested Python makes that flow a traceable value instead of an implicit call stack, and every node boundary becomes a span in a self-hosted Langfuse trace &mdash; queries and retrieved passages never leave infrastructure the project controls.</p>
+      <p>The fine-tuning result was earned, not assumed. A leakage-free experiment selected 120 CUAD contracts for training and held out 20 more for evaluation, mined 3,510 (question, correct clause, same-contract wrong clause) pairs from CUAD&rsquo;s own annotations, and scored clause retrieval within each held-out contract, which never contributed a training pair. Fine-tuning <code>bge-base</code> on those pairs more than doubled recall@1 and raised nDCG@10 by 26 points over the base model. A cross-encoder reranker trained on the same pairs added a further, smaller gain on top &mdash; but GPU-timed, CUDA-synchronised measurement put its cost at a 5&times; increase in per-query latency (10.4&thinsp;ms to 53.4&thinsp;ms median) for a gain that left recall@10 unchanged. On this corpus, the reranker is not a worthwhile addition; the fine-tuned embedder captures nearly all of the improvement alone.</p>
+      <p>Two operational details mattered more than expected. Structured LLM output through function-calling was unreliable on open OpenRouter models, which sometimes echoed the JSON schema instead of an instance &mdash; and a framework silently coercing that into an empty object was enough to make the critic veto a correct, fully-grounded answer. Switching to JSON-mode output and treating an all-zero critic response as a logged failure rather than a genuine score fixed it. And retrieval was never the latency bottleneck it first appeared to be: a misattributed one-time model load made an early trace show retrieval taking 6.4 seconds, but warm hybrid search runs in about 40 milliseconds once a startup warmup pays that cost once, and the real cost of a query is the LLM call.</p>
+
+      <div class="tbl-wrap">
+        <p class="tbl-label">Table 5 &mdash; CUAD clause retrieval, 20 held-out contracts, GPU</p>
+        <table class="paper-table">
+          <thead><tr><th>Configuration</th><th>R@1</th><th>R@10</th><th>nDCG@10</th><th>Median latency</th></tr></thead>
+          <tbody>
+            <tr><td>Base bge-base</td><td>0.227</td><td>0.707</td><td>0.451</td><td>10.4&thinsp;ms</td></tr>
+            <tr class="emphasis"><td>Fine-tuned bge-base</td><td>0.517</td><td>0.912</td><td>0.707</td><td>10.4&thinsp;ms</td></tr>
+            <tr><td>Fine-tuned + trained reranker</td><td>0.536</td><td>0.912</td><td>0.727</td><td>53.4&thinsp;ms</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>LangGraph · Langfuse · Qdrant · OpenRouter · FastAPI · Docker Compose</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/financial-rag-langgraph" target="_blank" rel="noopener">Repository</a></div>
   </section>
 
   <div class="colophon">
