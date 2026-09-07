@@ -152,6 +152,49 @@ body{
 }
 .paper-body ul li strong{ font-weight:600; }
 
+.contents{ margin:0 0 56px; }
+.contents-label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 8px;
+}
+.contents-entry{
+  display:block;
+  padding:10px 0;
+  border-bottom:1px solid var(--rule);
+  text-decoration:none;
+  color:inherit;
+}
+.contents-entry:last-child{ border-bottom:none; }
+.contents-row{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.contents-num{
+  font-family:var(--mono);
+  font-size:0.75rem;
+  color:var(--accent-ink);
+  flex-shrink:0;
+  width:24px;
+}
+.contents-title{
+  font-family:var(--serif);
+  font-size:0.9rem;
+  flex-shrink:0;
+}
+.contents-leader{
+  flex:1;
+  border-bottom:1px dotted var(--rule);
+  transform:translateY(-4px);
+  min-width:20px;
+}
+.contents-entry:hover .contents-title{ color:var(--accent-ink); }
+.contents-entry:hover .contents-leader{ border-bottom-color:var(--accent-ink); }
+
 .fig{ margin:32px 0; max-width:64ch; }
 .fig .fig-label{
   font-family:var(--mono);
@@ -355,6 +398,59 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     <h1>Applied Data Science, ML &amp; Agentic AI</h1>
     <p class="abstract">This section covers pipelines that separate untestable I/O from pure, unit-tested logic, and models validated on a forward time split rather than shuffled folds &mdash; the way a system behaves once deployed, not the way it scores in a notebook. Each entry below states its method before its result.</p>
   </div>
+
+  <nav class="contents">
+    <p class="contents-label">Contents</p>
+    <a class="contents-entry" href="#kafka-grid-intelligence">
+      <div class="contents-row">
+        <span class="contents-num">§1</span>
+        <span class="contents-title">Real-time grid-stress prediction over Kafka</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#nhs-intelligence-mcp">
+      <div class="contents-row">
+        <span class="contents-num">§2</span>
+        <span class="contents-title">MCP server for NHS waiting times &amp; trust quality</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#nhs-webscraper">
+      <div class="contents-row">
+        <span class="contents-num">§3</span>
+        <span class="contents-title">Fast and fault tolerant NHS data pipeline</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#actor_critic_financial_rag_repo">
+      <div class="contents-row">
+        <span class="contents-num">§4</span>
+        <span class="contents-title">Actor&ndash;critic RAG over SEC filings</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#financial-rag-aws">
+      <div class="contents-row">
+        <span class="contents-num">§5</span>
+        <span class="contents-title">Retrieval-first financial RAG on AWS</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#nhs-care-access-agent">
+      <div class="contents-row">
+        <span class="contents-num">§6</span>
+        <span class="contents-title">Evaluating models on grounded NHS tool use</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#financial-rag-langgraph">
+      <div class="contents-row">
+        <span class="contents-num">§7</span>
+        <span class="contents-title">Financial RAG on LangGraph, and finishing what §5 left open</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+  </nav>
 
   <section class="paper-section" id="kafka-grid-intelligence">
     <div class="section-num"><span class="num">§1</span><h2>Real-time grid-stress prediction over Kafka</h2></div>

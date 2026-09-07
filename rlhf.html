@@ -132,6 +132,49 @@ body{
 }
 .paper-body em{ font-style:italic; }
 
+.contents{ margin:0 0 56px; }
+.contents-label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 8px;
+}
+.contents-entry{
+  display:block;
+  padding:10px 0;
+  border-bottom:1px solid var(--rule);
+  text-decoration:none;
+  color:inherit;
+}
+.contents-entry:last-child{ border-bottom:none; }
+.contents-row{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.contents-num{
+  font-family:var(--mono);
+  font-size:0.75rem;
+  color:var(--accent-ink);
+  flex-shrink:0;
+  width:24px;
+}
+.contents-title{
+  font-family:var(--serif);
+  font-size:0.9rem;
+  flex-shrink:0;
+}
+.contents-leader{
+  flex:1;
+  border-bottom:1px dotted var(--rule);
+  transform:translateY(-4px);
+  min-width:20px;
+}
+.contents-entry:hover .contents-title{ color:var(--accent-ink); }
+.contents-entry:hover .contents-leader{ border-bottom-color:var(--accent-ink); }
+
 .fig{ margin:32px 0; max-width:64ch; }
 .fig .fig-label{
   font-family:var(--mono);
@@ -335,6 +378,45 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     <h1>LLM Post-Training &amp; RLHF Research</h1>
     <p class="abstract">Controlled experimental studies of post-training methods for modern instruction-tuned language models, including supervised fine-tuning, preference optimisation, and reinforcement learning from verifiable and human-derived rewards. Each study isolates a single variable and reports uncertainty using bootstrap confidence intervals or paired statistical tests instead of single-run point estimates.</p>
   </div>
+
+  <nav class="contents">
+    <p class="contents-label">Contents</p>
+    <a class="contents-entry" href="#qwen3-financial-sft-unsloth-dpo">
+      <div class="contents-row">
+        <span class="contents-num">§1</span>
+        <span class="contents-title">Financial LLM post-training: SFT &rarr; DPO on Qwen3-4B</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#grpo-math-reasoning">
+      <div class="contents-row">
+        <span class="contents-num">§2</span>
+        <span class="contents-title">GRPO vs. SFT on verifiable math reward</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#policy-gradient-from-scratch">
+      <div class="contents-row">
+        <span class="contents-num">§3</span>
+        <span class="contents-title">Policy gradients from scratch: REINFORCE &rarr; GRPO</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#rloo-vs-ppo-rlhf">
+      <div class="contents-row">
+        <span class="contents-num">§4</span>
+        <span class="contents-title">Reproducing RLOO vs. PPO with Claude as judge</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#sft-vs-dpo-grid-walk">
+      <div class="contents-row">
+        <span class="contents-num">§5</span>
+        <span class="contents-title">SFT vs. DPO on a minimal grid-walk grammar</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+  </nav>
 
   <section class="paper-section" id="qwen3-financial-sft-unsloth-dpo">
     <div class="section-num"><span class="num">§1</span><h2>Financial LLM post-training: SFT → DPO on Qwen3-4B</h2></div>
