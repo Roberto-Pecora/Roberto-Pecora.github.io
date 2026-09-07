@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Applied Data Science &amp; ML — Roberto Pecora</title>
+<title>Applied Data Science, ML &amp; Agentic AI — Roberto Pecora</title>
 <meta name="description" content="Production-shaped ML work: real-time grid-stress prediction, an NHS data MCP server and pipeline, actor-critic RAG over SEC filings, and a model-agnostic agent evaluated on grounded NHS tool use.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -347,12 +347,12 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
 
   <div class="running-head">
     <a href="index.html">← Roberto Pecora</a>
-    <span>Vol. II · Applied Data Science &amp; ML</span>
+    <span>Vol. II · Applied Data Science, ML &amp; Agentic AI</span>
   </div>
 
   <div class="masthead">
     <p class="kicker">Vol. II — 7 projects</p>
-    <h1>Applied Data Science &amp; ML</h1>
+    <h1>Applied Data Science, ML &amp; Agentic AI</h1>
     <p class="abstract">Production-shaped work on real-world data: pipelines that separate untestable I/O from pure, unit-tested logic, and models validated the way deployed models have to be — on time, rather than on shuffled folds. Each entry below states its method before its result.</p>
   </div>
 
@@ -472,9 +472,14 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     <div class="section-num"><span class="num">§5</span><h2>Retrieval-first financial RAG on AWS</h2></div>
     <p class="section-meta">financial-rag-aws</p>
     <div class="paper-body">
-      <p>The predecessor in §4 established a counter-intuitive result: on financial tables a &ldquo;stronger&rdquo; embedding model lost to the baseline, and hybrid dense-plus-BM25 retrieval was the decisive fix. This project takes that finding to a full AWS data plane and treats retrieval as a measurable engineering problem rather than a leaderboard exercise. It ingests the messy documents analysts actually use &mdash; text PDFs, linearised tables, Textract OCR for scans, and SEC HTML &mdash; into content-hash-keyed chunks over S3 and one small OpenSearch node that runs dense k-NN and BM25 fused with Reciprocal Rank Fusion, followed by a corpus-trained cross-encoder reranker. The actor cites retrieved evidence or abstains; every figure in an answer is traced back to a supporting passage, and any that matches no passage is flagged.</p>
+      <p>The predecessor in §4 established a counter-intuitive result: on financial tables a &ldquo;stronger&rdquo; embedding model lost to the baseline, and hybrid dense-plus-BM25 retrieval was the decisive fix. This project takes that finding to a full AWS deployment &mdash; S3 for document storage, an OpenSearch index for retrieval, and Terraform to provision it &mdash; with retrieval measured directly against a held-out set of financial questions. It ingests the messy documents analysts actually use &mdash; text PDFs, linearised tables, Textract OCR for scans, and SEC HTML &mdash; into content-hash-keyed chunks, retrieved by dense k-NN and BM25 fused with Reciprocal Rank Fusion, followed by a corpus-trained cross-encoder reranker. The actor cites retrieved evidence or abstains; every figure in an answer is traced back to a supporting passage, and any that matches no passage is flagged.</p>
       <p>Some credit questions need structure rather than a relevant paragraph. A property graph extracts issuer, instrument, and covenant relationships &mdash; deterministic gazetteer matching for stable entities, schema-guided LLM extraction for covenants &mdash; and serves them behind the same <code>{text, metadata, score}</code> contract as chunk retrieval, so the application switches backends without touching answer generation. A small, inspectable agent tool-loop composes retrieval, graph lookup, and arithmetic for multi-hop questions under turn and tool-call budgets. Retrieved text is demarcated as untrusted data with sanitised delimiters, so a document cannot inject instructions into the prompt.</p>
-      <p>Running the system live surfaced two failures the aggregate score hid. Retrieval drifted off the named company when a metric phrase dominated the query &mdash; &ldquo;Amazon operating cash flow&rdquo; returned other issuers&rsquo; cash-flow passages &mdash; fixed by extracting the entity and constraining retrieval with a metadata filter. And a from-scratch embedding comparison, run on a Colab GPU over FinanceBench, reproduced the predecessor&rsquo;s finding at larger scale: the mid-size <code>bge-base</code> beat both the smaller <code>bge-small</code> and the larger <code>bge-large</code>. Bigger did not help. The training and reranking artifacts are scaffolded and scored by the ablation runner but not finalised; the figures below are retrieval recall on a deliberately strict content-match harness, not comparable to public leaderboards.</p>
+      <p>Running the system live surfaced two findings the aggregate score had hidden:</p>
+      <ul>
+        <li><strong>Entity drift.</strong> Retrieval drifted off the named company when a metric phrase dominated the query &mdash; &ldquo;Amazon operating cash flow&rdquo; returned other issuers&rsquo; cash-flow passages &mdash; fixed by extracting the entity and constraining retrieval with a metadata filter.</li>
+        <li><strong>Embedding size.</strong> A from-scratch comparison, run on a Colab GPU over FinanceBench, reproduced the predecessor&rsquo;s finding at larger scale: the mid-size <code>bge-base</code> beat both the smaller <code>bge-small</code> and the larger <code>bge-large</code>. Bigger did not help.</li>
+      </ul>
+      <p>The training and reranking artifacts are scaffolded and scored by the ablation runner but not finalised; the figures below are retrieval recall on a deliberately strict content-match harness, not comparable to public leaderboards.</p>
 
       <div class="tbl-wrap">
         <p class="tbl-label">Table 4 &mdash; Embedding ablation, FinanceBench (150 queries, GPU)</p>
@@ -505,12 +510,12 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
         <li><strong>MiniMax</strong> matches Nemotron on accuracy but is three times slower (16s median vs. 5s).</li>
         <li><strong>The local 3B model</strong> scores 37.5% with no variance across runs, failing the same five cases every time: it prints tool calls as plain text instead of invoking them, passes malformed arguments, and confirms a false premise by agreeing that a 31-week clinical wait was short. Its failures are systematic, not random.</li>
       </ul>
-      <p>The most useful output is what the harness revealed about itself. Two <em>scoring</em> gaps are reported rather than hidden:</p>
+      <p>The most useful output is what the harness revealed about its own scoring:</p>
       <ul>
         <li>The keyword abstention check under-counts naturally phrased refusals — the largest source of error, and the only reason Sonnet drops below 100%.</li>
         <li>Requiring one specific tool penalises a correct answer reached by a valid alternate path.</li>
       </ul>
-      <p>An evaluator that reports its own measurement errors is worth more than one that reports a flattering number.</p>
+      <p>Both gaps account for the difference between Sonnet's 97.5% and a perfect score.</p>
 
       <div class="tbl-wrap">
         <p class="tbl-label">Table 4 — Frozen task set, 8 cases, n=5 (mean ± sample sd)</p>
@@ -541,9 +546,18 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     <div class="section-num"><span class="num">§7</span><h2>Financial RAG on LangGraph, and finishing what §5 left open</h2></div>
     <p class="section-meta">financial-rag-langgraph</p>
     <div class="paper-body">
-      <p>Project 5 identified its training and reranking artifacts as scaffolded and incomplete. This project completes that line of work by presenting a cloud-optional re-architecture of the pipeline using LangGraph and evaluating it with measured results rather than a prototype scaffold. The findings indicate that fine-tuning the embedding model on the target corpus, rather than using a larger general-purpose model, is the primary factor driving retrieval improvements. The orchestration architecture was also redesigned: corrective retrieval, actor&ndash;critic evaluation, and routing of multi-hop questions to a tool-using agent all involve cyclic and branching control flow. Representing these processes as a stateful graph, rather than as nested Python calls, makes the execution traceable and explicit, while each node boundary becomes a span in a self-hosted Langfuse trace. Consequently, queries and retrieved passages remain within infrastructure controlled by the project.</p>
-      <p>The fine-tuning results were obtained through a leakage-free experimental design. Specifically, 120 CUAD contracts were used for training, while 20 additional contracts were reserved exclusively for evaluation. From CUAD&rsquo;s annotations, the experiment generated 3,510 triplets consisting of a question, its correct clause, and an incorrect clause from the same contract. Clause retrieval was then evaluated within each held-out contract, none of which contributed training pairs. Fine-tuning <code>bge-base</code> on these data more than doubled recall@1 and increased nDCG@10 by 26 percentage points relative to the base model. Although a cross-encoder reranker trained on the same pairs produced a further, smaller improvement, GPU-timed and CUDA-synchronised measurements showed that it increased median per-query latency fivefold, from 10.4&thinsp;ms to 53.4&thinsp;ms, without improving recall@10. On this corpus, therefore, the reranker does not provide sufficient benefit to justify its computational cost; the fine-tuned embedder captures nearly all of the observed improvement.</p>
-      <p>Two operational findings were particularly significant. First, structured LLM output via function calling proved unreliable with open models accessed through OpenRouter. In some cases, models returned the JSON schema rather than a populated instance, while a framework silently coerced the malformed response into an empty object. This caused the critic to veto answers that were otherwise correct and fully grounded. Replacing function calling with JSON-mode output, and treating an all-zero critic response as a logged failure rather than as a valid score, resolved the issue. Second, retrieval was not the primary source of latency. An early trace incorrectly attributed a one-time model-loading operation to retrieval, producing an apparent retrieval time of 6.4 seconds. After a single startup warm-up, however, hybrid retrieval completed in approximately 40 milliseconds. The dominant component of end-to-end query latency was the LLM call.</p>
+      <p>Project 5 identified its training and reranking artifacts as scaffolded and incomplete. This project completes that line of work with a cloud-optional re-architecture of the pipeline on LangGraph, evaluated with measured results. The findings indicate that fine-tuning the embedding model on the target corpus, rather than using a larger general-purpose model, is the primary factor driving retrieval improvements. The orchestration architecture was also redesigned: corrective retrieval, actor&ndash;critic evaluation, and routing of multi-hop questions to a tool-using agent all involve cyclic and branching control flow. Representing these processes as a stateful graph, rather than as nested Python calls, makes the execution traceable and explicit, while each node boundary becomes a span in a self-hosted Langfuse trace. Consequently, queries and retrieved passages remain within infrastructure controlled by the project.</p>
+      <p>The fine-tuning results were obtained through a leakage-free experimental design: 120 CUAD contracts for training, 20 held out for evaluation, with 3,510 triplets of a question, its correct clause, and an incorrect clause from the same contract. Clause retrieval was evaluated within each held-out contract, none of which contributed training pairs:</p>
+      <ul>
+        <li><strong>Fine-tuning <code>bge-base</code></strong> on these data more than doubled recall@1 and increased nDCG@10 by 26 percentage points relative to the base model.</li>
+        <li><strong>A cross-encoder reranker</strong> trained on the same pairs produced a further, smaller improvement, but increased median per-query latency fivefold (10.4&thinsp;ms to 53.4&thinsp;ms) without improving recall@10.</li>
+      </ul>
+      <p>On this corpus, the reranker does not justify its computational cost; the fine-tuned embedder captures nearly all of the improvement.</p>
+      <p>Two operational findings were significant:</p>
+      <ul>
+        <li><strong>Structured LLM output via function calling</strong> was unreliable with open models on OpenRouter: some returned the JSON schema rather than a populated instance, and a framework silently coerced that into an empty object, causing the critic to veto correct, fully grounded answers. Replacing function calling with JSON-mode output, and treating an all-zero critic response as a logged failure, resolved it.</li>
+        <li><strong>Retrieval was not the primary source of latency.</strong> An early trace wrongly attributed a one-time model-loading cost to retrieval, showing 6.4 seconds; after a single startup warm-up, hybrid retrieval completed in about 40 milliseconds. The LLM call dominates end-to-end latency.</li>
+      </ul>
 
       <div class="tbl-wrap">
         <p class="tbl-label">Table 5 &mdash; CUAD clause retrieval, 20 held-out contracts, GPU</p>
