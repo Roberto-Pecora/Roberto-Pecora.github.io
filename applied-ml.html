@@ -131,6 +131,26 @@ body{
   color:var(--accent-ink);
 }
 .paper-body em{ font-style:italic; }
+.paper-body ul{
+  list-style:none;
+  margin:0 0 18px;
+  padding:0;
+  max-width:64ch;
+}
+.paper-body ul li{
+  font-size:1rem;
+  line-height:1.7;
+  margin:0 0 10px;
+  padding-left:1.1em;
+  position:relative;
+}
+.paper-body ul li::before{
+  content:"—";
+  position:absolute;
+  left:0;
+  color:var(--accent-ink);
+}
+.paper-body ul li strong{ font-weight:600; }
 
 .fig{ margin:32px 0; max-width:64ch; }
 .fig .fig-label{
@@ -477,9 +497,20 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     <p class="section-meta">nhs-care-access-agent</p>
     <div class="paper-body">
       <p>An MCP server makes trustworthy tools available; it does not prove a model will choose the right tool, pass valid arguments, read the result correctly, or abstain when the data is missing. This project builds a model-agnostic research agent over the read-only server from §2 and evaluates those behaviours separately, instead of treating a fluent answer as evidence of reliability.</p>
-      <p>The agent is a small, inspectable multi-turn tool-use loop with turn and tool-call budgets. One loop drives four interchangeable adapters — Claude, a local open-weight model through Ollama, and hosted open models — over the same tools and the same task set. A deterministic evaluator runs a frozen set of eight cases (direct lookup, ranking, a joined profile, a twelve-month trend, and three abstention or misleading-premise prompts) whose expected facts are pinned to one database snapshot by SHA-256, so a data change is caught rather than silently rescored. Each model runs the set five times: agents are stochastic, and a single pass over eight cases is a point estimate with no error bar.</p>
-      <p>Running each model five times changes the result. Claude Sonnet 5 sets the ceiling at 97.5%: its one recurring miss is not a capability gap, but the evaluator's own keyword-based abstention check failing to recognise a correctly hedged refusal. Nemotron-3 Super scored 87.5% on a single run; across five runs the mean is 77.5% &plusmn; 10.5, the widest spread of the four, so the first run had simply caught a lucky sample. MiniMax matches Nemotron on accuracy but is three times slower (16s median vs. 5s). The local 3B model scores 37.5% with no variance across runs, failing the same five cases every time: it prints tool calls as plain text instead of invoking them, passes malformed arguments, and confirms a false premise by agreeing that a 31-week clinical wait was short. Its failures are systematic, not random.</p>
-      <p>The most useful output is what the harness revealed about itself. Two <em>scoring</em> gaps are reported rather than hidden. The keyword abstention check under-counts naturally phrased refusals — the largest source of error, and the only reason Sonnet drops below 100%. And requiring one specific tool penalises a correct answer reached by a valid alternate path. An evaluator that reports its own measurement errors is worth more than one that reports a flattering number.</p>
+      <p>The agent is a small, inspectable tool-use loop with turn and tool-call budgets. One loop drives four interchangeable model backends — Claude, a local open-weight model through Ollama, and two hosted open models — over the same tools and the same tasks. Separately, a deterministic evaluator runs a fixed set of eight cases: direct lookup, ranking, a joined profile, a twelve-month trend, and three abstention or misleading-premise prompts. Each case's expected answer is locked to one database snapshot, so a later data change is caught rather than silently changing the score.</p>
+      <p>Each model runs the set five times, since a single pass gives a point estimate with no error bar:</p>
+      <ul>
+        <li><strong>Claude Sonnet 5</strong> sets the ceiling at 97.5%. Its one recurring miss is not a capability gap, but the evaluator's own keyword-based abstention check failing to recognise a correctly hedged refusal.</li>
+        <li><strong>Nemotron-3 Super</strong> scored 87.5% on a single run; across five runs the mean is 77.5% &plusmn; 10.5, the widest spread of the four, so the first run had simply caught a lucky sample.</li>
+        <li><strong>MiniMax</strong> matches Nemotron on accuracy but is three times slower (16s median vs. 5s).</li>
+        <li><strong>The local 3B model</strong> scores 37.5% with no variance across runs, failing the same five cases every time: it prints tool calls as plain text instead of invoking them, passes malformed arguments, and confirms a false premise by agreeing that a 31-week clinical wait was short. Its failures are systematic, not random.</li>
+      </ul>
+      <p>The most useful output is what the harness revealed about itself. Two <em>scoring</em> gaps are reported rather than hidden:</p>
+      <ul>
+        <li>The keyword abstention check under-counts naturally phrased refusals — the largest source of error, and the only reason Sonnet drops below 100%.</li>
+        <li>Requiring one specific tool penalises a correct answer reached by a valid alternate path.</li>
+      </ul>
+      <p>An evaluator that reports its own measurement errors is worth more than one that reports a flattering number.</p>
 
       <div class="tbl-wrap">
         <p class="tbl-label">Table 4 — Frozen task set, 8 cases, n=5 (mean ± sample sd)</p>
