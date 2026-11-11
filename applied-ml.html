@@ -394,7 +394,7 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
   </div>
 
   <div class="masthead">
-    <p class="kicker">Vol. II — 7 projects</p>
+    <p class="kicker">Vol. II — 8 projects</p>
     <h1>Applied Data Science, ML &amp; Agentic AI</h1>
     <p class="abstract">This section covers pipelines that separate untestable I/O from pure, unit-tested logic, and models validated on a forward time split rather than shuffled folds &mdash; the way a system behaves once deployed, not the way it scores in a notebook. Each entry below states its method before its result.</p>
   </div>
@@ -447,6 +447,13 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
       <div class="contents-row">
         <span class="contents-num">§7</span>
         <span class="contents-title">Financial RAG on LangGraph, and finishing what §5 left open</span>
+        <span class="contents-leader"></span>
+      </div>
+    </a>
+    <a class="contents-entry" href="#shipment-exception-agents">
+      <div class="contents-row">
+        <span class="contents-num">§8</span>
+        <span class="contents-title">Event-driven agents for shipment exceptions</span>
         <span class="contents-leader"></span>
       </div>
     </a>
@@ -669,6 +676,44 @@ table.paper-table tr.emphasis td{ font-style:italic; color:var(--accent-ink); }
     </div>
     <div class="apparatus"><span class="label">Stack</span>LangGraph · Langfuse · Qdrant · OpenRouter · FastAPI · Docker Compose</div>
     <div class="refs"><a href="https://github.com/Roberto-Pecora/financial-rag-langgraph" target="_blank" rel="noopener">Repository</a></div>
+  </section>
+
+  <section class="paper-section" id="shipment-exception-agents">
+    <div class="section-num"><span class="num">§8</span><h2>Event-driven agents for shipment exceptions</h2></div>
+    <p class="section-meta">shipment-exception-agents</p>
+    <div class="paper-body">
+      <p>The agents in §5 to §7 each run as a single loop inside one process. In production, an agent is one component in a system that has to survive redelivered messages, crashed workers, a provider outage and a model that picks the wrong action. This project handles carrier shipment exceptions &mdash; delays, customs holds, damage, address problems &mdash; as microservices on Kafka. Python services cover ingest, routing, deterministic playbooks, a bounded tool-calling agent, notifications and an ops API, and a TypeScript gateway fronts the carrier.</p>
+      <p>The design is deterministic first. An ordered policy table sends routine delays, address issues and small damage claims down fixed playbooks, sends high-value and lost shipments to a person by rule, and passes only what no rule can settle to the model. The agent works under step, cost and wall-clock budgets. Guardrails in code, not in the prompt, block actions on another shipment, rebookings that were never offered, claims above the declared value, and any automated action on temperature-controlled or high-value goods. A budget breach, a provider outage or the model's own doubt ends the case as an escalation to ops, never as a dropped event.</p>
+      <p>Delivery is at least once and duplicates are harmless. Each consumer commits only after its outputs are flushed, and dedupes on deterministic event ids. Every carrier side effect carries an idempotency key, and a write-ahead journal means a worker killed mid-run hands the case to a person rather than re-running the agent. One OpenTelemetry trace follows each case across Python and TypeScript through Kafka headers.</p>
+      <p>A React ops console sits on top. It lists the cases automation has handed to a person, shows what the agent already did so nobody repeats a rebooking or claim, and releases a case back to automation only after confirmation. Its API types are generated from the service's OpenAPI spec, and CI fails if they drift from the Python models.</p>
+      <p>Comparing the router-plus-agent design with an agent-only baseline on the same model surfaced three findings:</p>
+      <ul>
+        <li><strong>The first live run's misses were mostly the harness's fault.</strong> The tracking ETA shown to the agent left out the reported delay, so SLA breaches looked on time and the model reasonably declined to rebook. The fixture was fixed and the eval rerun; because the scenarios were revised after seeing failures, the results below are indicative, not a benchmark.</li>
+        <li><strong>A prompt rule was not enough.</strong> A smaller model rebooked temperature-controlled goods when only the prompt forbade it, so the rule moved into code.</li>
+        <li><strong>The guardrail caught a real action.</strong> Without the router, the model tried to rebook a &pound;25,000 consignment; the high-value guardrail blocked the call and the model escalated. In the hybrid design that case never reaches the model.</li>
+      </ul>
+
+      <div class="tbl-wrap">
+        <p class="tbl-label">Table 6 &mdash; Live eval, Kimi K3.1 Pro, 30 scenarios, one run</p>
+        <table class="paper-table">
+          <thead><tr><th>Design</th><th>Outcome acc.</th><th>Violations</th><th>Model calls</th><th>Cost</th><th>p50 / p95</th></tr></thead>
+          <tbody>
+            <tr class="emphasis"><td>Router + agent</td><td>30/30</td><td>0</td><td>53</td><td>$0.17</td><td>4.4 / 7.9&thinsp;s</td></tr>
+            <tr><td>Agent only</td><td>26/30</td><td>0</td><td>79</td><td>$0.26</td><td>5.5 / 10.0&thinsp;s</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="stat-group">
+        <div class="stat-group-item"><p class="stat-label">Offline CI gate</p><p class="stat-value">32/32</p></div>
+        <div class="stat-group-item"><p class="stat-label">Exceptions without the model</p><p class="stat-value">10/29</p></div>
+        <div class="stat-group-item"><p class="stat-label">Duplicate notifications</p><p class="stat-value">0</p></div>
+        <div class="stat-group-item"><p class="stat-label">Failure drills</p><p class="stat-value">5/5</p></div>
+      </div>
+      <p class="stat-note">The offline gate runs in CI against a scripted model, so it measures the harness &mdash; routing, guardrails, duplicate suppression, failure handling &mdash; not model quality. Every scenario is delivered twice, and policy violations are re-derived from emitted events independently of the guardrail code. Failure drills kill workers mid-case, inject poison messages and fail the sink. Built with Claude Code.</p>
+    </div>
+    <div class="apparatus"><span class="label">Stack</span>Kafka (Redpanda) · FastAPI · TypeScript / Fastify · React / Vite · nginx · Postgres · OpenTelemetry · Prometheus · OpenRouter</div>
+    <div class="refs"><a href="https://github.com/Roberto-Pecora/shipment-exception-agents" target="_blank" rel="noopener">Repository</a></div>
   </section>
 
   <div class="colophon">
